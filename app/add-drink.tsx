@@ -1,7 +1,9 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, Text, TextInput, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Drink } from '@/lib/bac';
 import { useApp } from '@/lib/context';
@@ -11,6 +13,7 @@ import { formatTime } from '@/lib/format';
 export default function AddDrink() {
   const { addDrink } = useApp();
   const router = useRouter();
+  const { bottom } = useSafeAreaInsets();
   const [drinkTime, setDrinkTime] = useState(() => new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showCustom, setShowCustom] = useState(false);
@@ -54,10 +57,10 @@ export default function AddDrink() {
   return (
     <View className="flex flex-1 bg-white">
       <Stack.Screen options={{ title: 'Add a Drink' }} />
-      <ScrollView
-        className="flex-1"
-        contentContainerClassName="p-6 pb-12"
-        keyboardShouldPersistTaps="handled">
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ padding: 24, paddingBottom: bottom + 24 }}
+        keyboardShouldPersistTaps="handled"
+        bottomOffset={24}>
         {/* Time selector */}
         <View className="flex-row items-center justify-between mb-6 bg-gray-50 rounded-xl p-3">
           <Text className="text-sm text-gray-500">Time</Text>
@@ -165,7 +168,7 @@ export default function AddDrink() {
             </Pressable>
           </View>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 }

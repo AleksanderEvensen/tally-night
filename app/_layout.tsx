@@ -1,5 +1,5 @@
 import '../global.css';
-import { KeyboardAvoidingView, Platform } from 'react-native';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Stack } from 'expo-router';
@@ -9,10 +9,8 @@ import { AppProvider } from '@/lib/context';
 export default function Layout() {
   return (
     <SafeAreaProvider>
-      <AppProvider>
-        <KeyboardAvoidingView
-          className="flex-1"
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <KeyboardProvider>
+        <AppProvider>
           <Stack
             screenOptions={{
               headerShadowVisible: false,
@@ -20,8 +18,8 @@ export default function Layout() {
               contentStyle: { backgroundColor: '#fff' },
             }}
           />
-        </KeyboardAvoidingView>
-      </AppProvider>
+        </AppProvider>
+      </KeyboardProvider>
     </SafeAreaProvider>
   );
 }

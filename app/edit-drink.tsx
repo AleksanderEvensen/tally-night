@@ -2,6 +2,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/lib/context';
 import { formatTime } from '@/lib/format';
@@ -9,6 +10,7 @@ import { formatTime } from '@/lib/format';
 export default function EditDrink() {
   const { drinks, updateDrink } = useApp();
   const router = useRouter();
+  const { bottom } = useSafeAreaInsets();
   const { index: indexParam } = useLocalSearchParams<{ index: string }>();
   const index = Number(indexParam);
   const drink = drinks[index];
@@ -51,7 +53,7 @@ export default function EditDrink() {
       <Stack.Screen options={{ title: 'Edit Drink' }} />
       <ScrollView
         className="flex-1"
-        contentContainerClassName="p-6 pb-12"
+        contentContainerStyle={{ padding: 24, paddingBottom: bottom + 24 }}
         keyboardShouldPersistTaps="handled">
         {/* Time selector */}
         <View className="flex-row items-center justify-between mb-6 bg-gray-50 rounded-xl p-3">
