@@ -36,7 +36,8 @@
     "dist/*",
     ".agents/**/*",
     ".claude/**/*",
-    "bun.lock"
+    "bun.lock",
+    "convex/_generated/**/*"
   ],
   "rules": {
     "import/namespace": "error",
