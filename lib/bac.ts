@@ -71,9 +71,36 @@ const STEP_HOURS = 1 / 60;
 
 export type StomachStatus = keyof typeof ABSORPTION_RATES;
 
-export const DRINK_TYPES = ['beer', 'wine', 'shot', 'cocktail'] as const;
+export const DRINK_TYPES = [
+  'beer',
+  'wine',
+  'spirit',
+  'cocktail',
+  'shot',
+  'cider_or_seltzer',
+] as const;
 
-export type DrinkType = (typeof DRINK_TYPES)[number] | (string & {});
+export type DrinkType = (typeof DRINK_TYPES)[number];
+
+/** Canonical emoji for each drink type. */
+export const DRINK_TYPE_EMOJI: Record<DrinkType, string> = {
+  beer: '🍺',
+  wine: '🍷',
+  spirit: '🥃',
+  cocktail: '🍸',
+  shot: '🥃',
+  cider_or_seltzer: '🍏',
+};
+
+/** Human-readable label for each drink type. */
+export const DRINK_TYPE_LABEL: Record<DrinkType, string> = {
+  beer: 'Beer',
+  wine: 'Wine',
+  spirit: 'Spirit',
+  cocktail: 'Cocktail',
+  shot: 'Shot',
+  cider_or_seltzer: 'Cider / Seltzer',
+};
 
 export interface Drink {
   time: Date;

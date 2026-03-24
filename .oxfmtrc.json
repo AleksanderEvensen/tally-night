@@ -4,5 +4,12 @@
   "bracketSameLine": true,
   "trailingComma": "es5",
   "sortPackageJson": false,
-  "ignorePatterns": ["**/*.md"]
+  "ignorePatterns": [
+    "**/*.md",
+    "ios/**/*",
+    "android/**/*",
+    ".agents/**/*",
+    ".claude/**/*",
+    "bun.lock"
+  ]
 }

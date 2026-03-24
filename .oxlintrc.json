@@ -29,7 +29,15 @@
     "setImmediate": "readonly",
     "shared-node-browser": "writable"
   },
-  "ignorePatterns": ["android/app/build", "dist/*"],
+  "ignorePatterns": [
+    "**/*.md",
+    "ios/**/*",
+    "android/**/*",
+    "dist/*",
+    ".agents/**/*",
+    ".claude/**/*",
+    "bun.lock"
+  ],
   "rules": {
     "import/namespace": "error",
     "import/export": "error",

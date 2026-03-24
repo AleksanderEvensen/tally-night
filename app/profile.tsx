@@ -1,12 +1,17 @@
 import { Stack, useRouter } from 'expo-router';
+import { useMutation } from 'convex/react';
 import { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
+import { Input } from '@/components/Input';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 import { useApp } from '@/lib/context';
 
 export default function Profile() {
-  const { userInfo, setUserInfo } = useApp();
+  const { userInfo, setUserInfo, dataConsent, convexUserId } = useApp();
   const router = useRouter();
+  const updateUser = useMutation(api.users.updateUser);
   const [name, setName] = useState(userInfo?.name ?? '');
   const [gender, setGender] = useState<'male' | 'female'>(userInfo?.gender ?? 'male');
   const [weight, setWeight] = useState(String(userInfo?.weightInKg ?? ''));
@@ -15,7 +20,18 @@ export default function Profile() {
 
   async function handleSave() {
     if (!canSave) return;
-    await setUserInfo({ name: name.trim(), gender, weightInKg: Number(weight) });
+    const trimmedName = name.trim();
+    await setUserInfo({ name: trimmedName, gender, weightInKg: Number(weight) });
+
+    // Sync name to backend if consented
+    if (dataConsent && convexUserId) {
+      try {
+        await updateUser({ userId: convexUserId as Id<'users'>, name: trimmedName });
+      } catch {
+        // Non-critical — name sync failure doesn't block local save
+      }
+    }
+
     router.back();
   }
 
@@ -27,10 +43,9 @@ export default function Profile() {
         <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
           Name
         </Text>
-        <TextInput
-          className="border-2 border-gray-200 rounded-2xl px-4 py-4 text-lg text-gray-900 mb-8"
+        <Input
+          className="mb-8"
           placeholder="At least 2 characters"
-          placeholderTextColor="#9ca3af"
           value={name}
           onChangeText={setName}
           autoCapitalize="words"
@@ -72,10 +87,8 @@ export default function Profile() {
         <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
           Weight (kg)
         </Text>
-        <TextInput
-          className="border-2 border-gray-200 rounded-2xl px-4 py-4 text-lg text-gray-900"
+        <Input
           placeholder="e.g. 75"
-          placeholderTextColor="#9ca3af"
           keyboardType="numeric"
           value={weight}
           onChangeText={setWeight}
@@ -90,6 +103,18 @@ export default function Profile() {
           <Text className={`text-lg font-semibold ${canSave ? 'text-white' : 'text-gray-400'}`}>
             Save
           </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => router.push('/drink-presets')}
+          className="mt-4 rounded-2xl py-4 items-center border-2 border-gray-200">
+          <Text className="text-base font-semibold text-gray-600">Drink Presets</Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => router.push('/privacy')}
+          className="mt-4 rounded-2xl py-4 items-center border-2 border-gray-200">
+          <Text className="text-base font-semibold text-gray-600">Data & Privacy</Text>
         </Pressable>
       </View>
     </View>

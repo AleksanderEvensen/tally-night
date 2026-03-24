@@ -1,11 +1,19 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 import type { Drink, StomachStatus, UserInfo, WaterEntry } from './bac';
+import type { DrinkPreset } from './drink-presets';
+import { DEFAULT_DRINK_PRESETS } from './drink-presets';
 import {
+  loadConvexUserId,
+  loadDataConsent,
+  loadDrinkPresets,
   loadDrinks,
   loadStomachStatus,
   loadUserInfo,
   loadWaterEntries,
+  saveConvexUserId,
+  saveDataConsent,
+  saveDrinkPresets,
   saveDrinks,
   saveStomachStatus,
   saveUserInfo,
@@ -17,7 +25,10 @@ interface AppState {
   drinks: Drink[];
   waterEntries: WaterEntry[];
   stomachStatus: StomachStatus;
+  drinkPresets: DrinkPreset[];
   isLoading: boolean;
+  convexUserId: string | null;
+  dataConsent: boolean;
   setUserInfo: (info: UserInfo) => Promise<void>;
   addDrink: (drink: Drink) => Promise<void>;
   updateDrink: (index: number, drink: Drink) => Promise<void>;
@@ -26,6 +37,9 @@ interface AppState {
   deleteWater: (index: number) => Promise<void>;
   clearDrinks: () => Promise<void>;
   setStomachStatus: (status: StomachStatus) => Promise<void>;
+  setDrinkPresets: (presets: DrinkPreset[]) => Promise<void>;
+  setConvexUserId: (id: string) => void;
+  setDataConsent: (consent: boolean) => void;
 }
 
 const AppContext = createContext<AppState | null>(null);
@@ -35,7 +49,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [drinks, setDrinks] = useState<Drink[]>([]);
   const [waterEntries, setWaterEntries] = useState<WaterEntry[]>([]);
   const [stomachStatus, setStomachStatusState] = useState<StomachStatus>('moderate');
+  const [drinkPresetsState, setDrinkPresetsState] = useState<DrinkPreset[]>(DEFAULT_DRINK_PRESETS);
   const [isLoading, setIsLoading] = useState(true);
+  const [convexUserId, setConvexUserIdState] = useState<string | null>(null);
+  const [dataConsent, setDataConsentState] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -49,6 +66,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setDrinks(storedDrinks);
       setWaterEntries(storedWater);
       setStomachStatusState(stomach);
+      const storedPresets = loadDrinkPresets();
+      if (storedPresets) setDrinkPresetsState(storedPresets);
+      setConvexUserIdState(loadConvexUserId());
+      setDataConsentState(loadDataConsent());
       setIsLoading(false);
     }
     load();
@@ -61,7 +82,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const addDrink = useCallback(
     async (drink: Drink) => {
-      const updated = [...drinks, drink];
+      const updated = [...drinks, drink].sort((a, b) => a.time.getTime() - b.time.getTime());
       setDrinks(updated);
       await saveDrinks(updated);
     },
@@ -72,6 +93,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     async (index: number, drink: Drink) => {
       const updated = [...drinks];
       updated[index] = drink;
+      updated.sort((a, b) => a.time.getTime() - b.time.getTime());
       setDrinks(updated);
       await saveDrinks(updated);
     },
@@ -89,7 +111,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const addWater = useCallback(
     async (entry: WaterEntry) => {
-      const updated = [...waterEntries, entry];
+      const updated = [...waterEntries, entry].sort((a, b) => a.time.getTime() - b.time.getTime());
       setWaterEntries(updated);
       await saveWaterEntries(updated);
     },
@@ -116,6 +138,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await saveStomachStatus(status);
   }, []);
 
+  const setDrinkPresets = useCallback(async (presets: DrinkPreset[]) => {
+    setDrinkPresetsState(presets);
+    await saveDrinkPresets(presets);
+  }, []);
+
+  const setConvexUserId = useCallback((id: string) => {
+    setConvexUserIdState(id);
+    saveConvexUserId(id);
+  }, []);
+
+  const setDataConsent = useCallback((consent: boolean) => {
+    setDataConsentState(consent);
+    saveDataConsent(consent);
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -123,7 +160,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         drinks,
         waterEntries,
         stomachStatus,
+        drinkPresets: drinkPresetsState,
         isLoading,
+        convexUserId,
+        dataConsent,
         setUserInfo,
         addDrink,
         updateDrink,
@@ -132,6 +172,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         deleteWater,
         clearDrinks,
         setStomachStatus,
+        setDrinkPresets,
+        setConvexUserId,
+        setDataConsent,
       }}>
       {children}
     </AppContext.Provider>

@@ -1,7 +1,8 @@
 import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
+import { Input } from '@/components/Input';
 import { useApp } from '@/lib/context';
 
 export default function Onboarding() {
@@ -33,10 +34,9 @@ export default function Onboarding() {
         <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
           Name
         </Text>
-        <TextInput
-          className="border-2 border-gray-200 rounded-2xl px-4 py-4 text-lg text-gray-900 mb-8"
+        <Input
+          className="mb-8"
           placeholder="At least 2 characters"
-          placeholderTextColor="#9ca3af"
           value={name}
           onChangeText={setName}
           autoCapitalize="words"
@@ -78,10 +78,8 @@ export default function Onboarding() {
         <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
           Weight (kg)
         </Text>
-        <TextInput
-          className="border-2 border-gray-200 rounded-2xl px-4 py-4 text-lg text-gray-900"
+        <Input
           placeholder="e.g. 75"
-          placeholderTextColor="#9ca3af"
           keyboardType="numeric"
           value={weight}
           onChangeText={setWeight}

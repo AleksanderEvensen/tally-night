@@ -1,27 +1,27 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Platform, Pressable, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { Drink } from '@/lib/bac';
+import { Input } from '@/components/Input';
+import { DRINK_TYPE_EMOJI, DRINK_TYPE_LABEL, DRINK_TYPES, type Drink, type DrinkType } from '@/lib/bac';
 import { useApp } from '@/lib/context';
-import { DRINK_PRESETS } from '@/lib/drink-presets';
 import { formatTime } from '@/lib/format';
 
 export default function AddDrink() {
-  const { addDrink } = useApp();
+  const { addDrink, drinkPresets } = useApp();
   const router = useRouter();
   const { bottom } = useSafeAreaInsets();
   const [drinkTime, setDrinkTime] = useState(() => new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showCustom, setShowCustom] = useState(false);
-  const [customName, setCustomName] = useState('');
+  const [customType, setCustomType] = useState<DrinkType>('beer');
   const [customVolume, setCustomVolume] = useState('');
   const [customPercent, setCustomPercent] = useState('');
 
-  async function handleSelect(preset: (typeof DRINK_PRESETS)[number]) {
+  async function handleSelect(preset: (typeof drinkPresets)[number]) {
     const drink: Drink = {
       time: drinkTime,
       type: preset.type,
@@ -39,7 +39,7 @@ export default function AddDrink() {
 
     const drink: Drink = {
       time: drinkTime,
-      type: customName.trim() || 'custom',
+      type: customType,
       volumeMl: volume,
       alcoholPercent: percent,
     };
@@ -95,7 +95,7 @@ export default function AddDrink() {
           Quick Pick
         </Text>
         <View className="flex-row flex-wrap gap-4 mb-6">
-          {DRINK_PRESETS.map((preset) => (
+          {drinkPresets.map((preset) => (
             <Pressable
               key={preset.id}
               onPress={() => handleSelect(preset)}
@@ -124,30 +124,41 @@ export default function AddDrink() {
           </Pressable>
         ) : (
           <View className="border-2 border-gray-200 rounded-2xl p-4">
-            <Text className="text-sm text-gray-500 mb-1">Name (optional)</Text>
-            <TextInput
-              className="border border-gray-200 rounded-xl px-3 py-3 text-base text-gray-900 mb-3"
-              placeholder="e.g. Margarita"
-              placeholderTextColor="#9ca3af"
-              value={customName}
-              onChangeText={setCustomName}
-            />
+            <Text className="text-sm text-gray-500 mb-2">Type</Text>
+            <View className="flex-row flex-wrap gap-2 mb-4">
+              {DRINK_TYPES.map((t) => (
+                <Pressable
+                  key={t}
+                  onPress={() => setCustomType(t)}
+                  className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl border-2 ${
+                    customType === t ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'
+                  }`}>
+                  <Text className="text-base">{DRINK_TYPE_EMOJI[t]}</Text>
+                  <Text
+                    className={`text-sm font-medium ${
+                      customType === t ? 'text-indigo-600' : 'text-gray-600'
+                    }`}>
+                    {DRINK_TYPE_LABEL[t]}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
 
             <Text className="text-sm text-gray-500 mb-1">Volume (ml)</Text>
-            <TextInput
-              className="border border-gray-200 rounded-xl px-3 py-3 text-base text-gray-900 mb-3"
+            <Input
+              size="compact"
+              className="mb-3"
               placeholder="e.g. 330"
-              placeholderTextColor="#9ca3af"
               keyboardType="numeric"
               value={customVolume}
               onChangeText={setCustomVolume}
             />
 
             <Text className="text-sm text-gray-500 mb-1">Alcohol %</Text>
-            <TextInput
-              className="border border-gray-200 rounded-xl px-3 py-3 text-base text-gray-900 mb-4"
+            <Input
+              size="compact"
+              className="mb-4"
               placeholder="e.g. 5"
-              placeholderTextColor="#9ca3af"
               keyboardType="numeric"
               value={customPercent}
               onChangeText={setCustomPercent}

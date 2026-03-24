@@ -9,7 +9,7 @@ export interface DrinkPreset {
   emoji: string;
 }
 
-export const DRINK_PRESETS: DrinkPreset[] = [
+export const DEFAULT_DRINK_PRESETS: DrinkPreset[] = [
   {
     id: 'beer-330',
     name: 'Beer 0.33l',

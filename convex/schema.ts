@@ -24,8 +24,10 @@ export default defineSchema({
     drinks: v.object({
       beer: v.number(),
       wine: v.number(),
-      shots: v.number(),
+      spirits: v.number(),
       cocktails: v.number(),
+      shots: v.number(),
+      ciders_seltzers: v.number(),
     }),
     bloodAlcoholLevel: v.number(),
   })

@@ -1,5 +1,4 @@
-import { internalMutation, mutation, query } from './_generated/server';
-import { MutationCtx } from './_generated/server';
+import { internalMutation, mutation, query, MutationCtx } from './_generated/server';
 import { v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 import { UTCDate } from '@date-fns/utc';
@@ -16,8 +15,10 @@ function generateJoinCode(): string {
 const DEFAULT_DRINKS = {
   beer: 0,
   wine: 0,
-  shots: 0,
+  spirits: 0,
   cocktails: 0,
+  shots: 0,
+  ciders_seltzers: 0,
 };
 
 // ── Shared helpers (used by mutations across files) ──────────────────────────
@@ -262,12 +263,15 @@ export const updateDrinks = mutation({
     drinks: v.object({
       beer: v.number(),
       wine: v.number(),
-      shots: v.number(),
+      spirits: v.number(),
       cocktails: v.number(),
+      shots: v.number(),
+      ciders_seltzers: v.number(),
     }),
+    bloodAlcoholLevel: v.number(),
   },
   async handler(ctx, args) {
-    const { userId, groupId, drinks } = args;
+    const { userId, groupId, drinks, bloodAlcoholLevel } = args;
 
     const info = await ctx.db
       .query('userGroupInfos')
@@ -285,15 +289,12 @@ export const updateDrinks = mutation({
       }
     }
 
-    // Estimate BAC using a simplified Widmark formula
-    // Standard drinks: beer=1, wine=1.5, shot=1.5, cocktail=1.5
-    const standardDrinks =
-      drinks.beer * 1 + drinks.wine * 1.5 + drinks.shots * 1.5 + drinks.cocktails * 1.5;
+    // Validate BAC is non-negative
+    if (bloodAlcoholLevel < 0) {
+      throw new Error('Blood alcohol level cannot be negative');
+    }
 
-    // Rough BAC estimate (assuming ~70kg person, just for fun/ranking)
-    // BAC = (standardDrinks * 10) / (70 * 0.68) * 100  (simplified)
-    const bloodAlcoholLevel = Math.round(standardDrinks * 0.21 * 100) / 100;
-
+    // Use client-provided BAC (computed on-device using the full pharmacokinetic model)
     await ctx.db.patch(info._id, {
       drinks,
       bloodAlcoholLevel,

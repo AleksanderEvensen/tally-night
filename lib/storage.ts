@@ -1,11 +1,15 @@
 import { createMMKV } from 'react-native-mmkv';
 import type { Drink, StomachStatus, UserInfo, WaterEntry } from './bac';
+import type { DrinkPreset } from './drink-presets';
 
 const KEYS = {
   USER_INFO: 'user_info',
   DRINKS: 'drinks',
   WATER: 'water',
   STOMACH_STATUS: 'stomach_status',
+  CONVEX_USER_ID: 'convex_user_id',
+  DATA_CONSENT: 'data_consent',
+  DRINK_PRESETS: 'drink_presets',
 } as const;
 
 interface StoredDrink {
@@ -49,8 +53,10 @@ export function loadDrinks(): Drink[] {
   if (!raw) return [];
   const stored = JSON.parse(raw) as StoredDrink[];
   return stored.map((d) => ({
-    ...d,
     time: new Date(d.time),
+    type: d.type as Drink['type'],
+    volumeMl: d.volumeMl,
+    alcoholPercent: d.alcoholPercent,
   }));
 }
 
@@ -80,4 +86,30 @@ export function loadStomachStatus(): StomachStatus {
   const raw = storage.getString(KEYS.STOMACH_STATUS);
   if (raw === 'empty' || raw === 'moderate' || raw === 'full') return raw;
   return 'moderate';
+}
+
+export function saveConvexUserId(id: string): void {
+  storage.set(KEYS.CONVEX_USER_ID, id);
+}
+
+export function loadConvexUserId(): string | null {
+  return storage.getString(KEYS.CONVEX_USER_ID) ?? null;
+}
+
+export function saveDataConsent(consent: boolean): void {
+  storage.set(KEYS.DATA_CONSENT, consent ? 'true' : 'false');
+}
+
+export function loadDataConsent(): boolean {
+  return storage.getString(KEYS.DATA_CONSENT) === 'true';
+}
+
+export function saveDrinkPresets(presets: DrinkPreset[]): void {
+  storage.set(KEYS.DRINK_PRESETS, JSON.stringify(presets));
+}
+
+export function loadDrinkPresets(): DrinkPreset[] | null {
+  const raw = storage.getString(KEYS.DRINK_PRESETS);
+  if (!raw) return null;
+  return JSON.parse(raw) as DrinkPreset[];
 }

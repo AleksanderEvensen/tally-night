@@ -1,9 +1,16 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Input } from '@/components/Input';
+import {
+  DRINK_TYPE_EMOJI,
+  DRINK_TYPE_LABEL,
+  DRINK_TYPES,
+  type DrinkType,
+} from '@/lib/bac';
 import { useApp } from '@/lib/context';
 import { formatTime } from '@/lib/format';
 
@@ -17,7 +24,7 @@ export default function EditDrink() {
 
   const [drinkTime, setDrinkTime] = useState(() => (drink ? new Date(drink.time) : new Date()));
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [name, setName] = useState(drink?.type ?? '');
+  const [type, setType] = useState<DrinkType>(drink?.type ?? 'beer');
   const [volume, setVolume] = useState(String(drink?.volumeMl ?? ''));
   const [percent, setPercent] = useState(String(drink?.alcoholPercent ?? ''));
 
@@ -36,7 +43,7 @@ export default function EditDrink() {
     if (!canSave) return;
     await updateDrink(index, {
       time: drinkTime,
-      type: name.trim() || 'custom',
+      type,
       volumeMl: Number(volume),
       alcoholPercent: Number(percent),
     });
@@ -84,30 +91,41 @@ export default function EditDrink() {
           </View>
         )}
 
-        <Text className="text-sm text-gray-500 mb-1">Name</Text>
-        <TextInput
-          className="border border-gray-200 rounded-xl px-3 py-3 text-base text-gray-900 mb-3"
-          placeholder="e.g. Beer"
-          placeholderTextColor="#9ca3af"
-          value={name}
-          onChangeText={setName}
-        />
+        <Text className="text-sm text-gray-500 mb-2">Type</Text>
+        <View className="flex-row flex-wrap gap-2 mb-4">
+          {DRINK_TYPES.map((t) => (
+            <Pressable
+              key={t}
+              onPress={() => setType(t)}
+              className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl border-2 ${
+                type === t ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'
+              }`}>
+              <Text className="text-base">{DRINK_TYPE_EMOJI[t]}</Text>
+              <Text
+                className={`text-sm font-medium ${
+                  type === t ? 'text-indigo-600' : 'text-gray-600'
+                }`}>
+                {DRINK_TYPE_LABEL[t]}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
 
         <Text className="text-sm text-gray-500 mb-1">Volume (ml)</Text>
-        <TextInput
-          className="border border-gray-200 rounded-xl px-3 py-3 text-base text-gray-900 mb-3"
+        <Input
+          size="compact"
+          className="mb-3"
           placeholder="e.g. 330"
-          placeholderTextColor="#9ca3af"
           keyboardType="numeric"
           value={volume}
           onChangeText={setVolume}
         />
 
         <Text className="text-sm text-gray-500 mb-1">Alcohol %</Text>
-        <TextInput
-          className="border border-gray-200 rounded-xl px-3 py-3 text-base text-gray-900 mb-4"
+        <Input
+          size="compact"
+          className="mb-4"
           placeholder="e.g. 5"
-          placeholderTextColor="#9ca3af"
           keyboardType="numeric"
           value={percent}
           onChangeText={setPercent}

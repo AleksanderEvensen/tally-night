@@ -4,7 +4,14 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { type Drink, type StomachStatus, type WaterEntry, estimateBAC } from '@/lib/bac';
+import {
+  DRINK_TYPE_EMOJI,
+  DRINK_TYPE_LABEL,
+  type Drink,
+  type StomachStatus,
+  type WaterEntry,
+  estimateBAC,
+} from '@/lib/bac';
 import { useApp } from '@/lib/context';
 import { formatTime } from '@/lib/format';
 
@@ -46,6 +53,7 @@ export default function Home() {
     addWater,
     deleteDrink,
     deleteWater,
+    clearDrinks,
     isLoading,
   } = useApp();
   const { bottom } = useSafeAreaInsets();
@@ -56,6 +64,16 @@ export default function Home() {
     const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
+
+  // Auto-clear history if the last drink was over 12 hours ago
+  useEffect(() => {
+    if (drinks.length === 0) return;
+    const latestDrinkTime = Math.max(...drinks.map((d) => d.time.getTime()));
+    const twelveHoursMs = 12 * 60 * 60 * 1000;
+    if (Date.now() - latestDrinkTime > twelveHoursMs) {
+      clearDrinks();
+    }
+  }, [drinks, clearDrinks]);
 
   if (isLoading) {
     return (
@@ -99,6 +117,17 @@ export default function Home() {
     ]);
   }
 
+  function confirmClearHistory() {
+    Alert.alert(
+      'Clear History',
+      'This will delete all your drinks and water entries. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Clear All', style: 'destructive', onPress: () => clearDrinks() },
+      ]
+    );
+  }
+
   function logWater(ml: number) {
     addWater({ time: new Date(), volumeMl: ml });
   }
@@ -109,9 +138,14 @@ export default function Home() {
         options={{
           title: 'BAC Tracker',
           headerRight: () => (
-            <Pressable onPress={() => router.push('/profile')} hitSlop={8}>
-              <Ionicons name="person-circle-outline" size={28} color="#6366f1" />
-            </Pressable>
+            <View className="flex-row items-center gap-3">
+              <Pressable onPress={() => router.push('/groups')} hitSlop={8}>
+                <Ionicons name="people-outline" size={26} color="#6366f1" />
+              </Pressable>
+              <Pressable onPress={() => router.push('/profile')} hitSlop={8}>
+                <Ionicons name="person-circle-outline" size={28} color="#6366f1" />
+              </Pressable>
+            </View>
           ),
         }}
       />
@@ -184,7 +218,18 @@ export default function Home() {
         </View>
 
         <View className="px-6">
-          <Text className="text-lg font-semibold text-gray-800 mb-3">History</Text>
+          <View className="flex-row items-center justify-between mb-3">
+            <Text className="text-lg font-semibold text-gray-800">History</Text>
+            {history.length > 0 && (
+              <Pressable
+                onPress={confirmClearHistory}
+                hitSlop={8}
+                className="flex-row items-center gap-1">
+                <Ionicons name="trash-outline" size={16} color="#9ca3af" />
+                <Text className="text-sm text-gray-400">Clear</Text>
+              </Pressable>
+            )}
+          </View>
           {history.length === 0 ? (
             <Text className="text-gray-400 text-center py-8">
               No entries yet.{'\n'}Tap {'"'}Add Drink{'"'} to get started.
@@ -199,17 +244,11 @@ export default function Home() {
                     className="flex-row items-center justify-between py-3 border-b border-gray-100">
                     <View className="flex-row items-center gap-3 flex-1">
                       <Text className="text-2xl">
-                        {drink.type === 'beer'
-                          ? '🍺'
-                          : drink.type === 'wine'
-                            ? '🍷'
-                            : drink.type === 'shot'
-                              ? '🥃'
-                              : '🍸'}
+                        {DRINK_TYPE_EMOJI[drink.type] ?? '🍸'}
                       </Text>
                       <View className="flex-1">
-                        <Text className="text-base font-medium text-gray-800 capitalize">
-                          {drink.type}
+                        <Text className="text-base font-medium text-gray-800">
+                          {DRINK_TYPE_LABEL[drink.type] ?? drink.type}
                         </Text>
                         <Text className="text-sm text-gray-400">
                           {drink.volumeMl}ml · {drink.alcoholPercent}% · {formatTime(drink.time)}
