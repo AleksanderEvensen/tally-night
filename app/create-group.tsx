@@ -1,10 +1,13 @@
 import { Stack, useRouter } from 'expo-router';
 import { useMutation } from 'convex/react';
 import { useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 
-import { Input } from '@/components/Input';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { useApp } from '@/lib/context';
@@ -24,6 +27,7 @@ export default function CreateGroup() {
   const [isCreating, setIsCreating] = useState(false);
   const [result, setResult] = useState<{ groupId: string; joinCode: string } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const createGroup = useMutation(api.groups.createGroup);
 
@@ -32,6 +36,7 @@ export default function CreateGroup() {
   async function handleCreate() {
     if (!canCreate || !convexUserId) return;
     setIsCreating(true);
+    setError(null);
 
     try {
       const res = await createGroup({
@@ -41,7 +46,7 @@ export default function CreateGroup() {
       });
       setResult({ groupId: res.groupId, joinCode: res.joinCode });
     } catch {
-      Alert.alert('Error', 'Could not create group. Please try again.');
+      setError('Could not create group. Please try again.');
     } finally {
       setIsCreating(false);
     }
@@ -58,27 +63,28 @@ export default function CreateGroup() {
     return (
       <View className="flex flex-1 bg-white px-6 items-center justify-center">
         <Stack.Screen options={{ title: 'Group Created' }} />
-        <Text className="text-2xl font-bold text-gray-900 mb-2">Group Created!</Text>
+        <Text variant="h3" className="mb-2">
+          Group Created!
+        </Text>
         <Text className="text-base text-gray-500 mb-6 text-center">
           Share this code with your friends to join:
         </Text>
-        <View className="bg-gray-50 rounded-2xl px-8 py-6 items-center border-2 border-gray-200 mb-4">
+        <Card className="px-8 py-6 items-center mb-4">
           <Text className="text-4xl font-bold text-indigo-600 tracking-[8px]">
             {result.joinCode}
           </Text>
-        </View>
-        <Pressable onPress={handleCopy} className="bg-indigo-500 rounded-2xl py-3 px-8 mb-6">
-          <Text className="text-white text-base font-semibold">
-            {copied ? 'Copied!' : 'Copy Code'}
-          </Text>
-        </Pressable>
-        <Pressable
+        </Card>
+        <Button onPress={handleCopy} className="rounded-2xl py-3 px-8 mb-6">
+          <Text>{copied ? 'Copied!' : 'Copy Code'}</Text>
+        </Button>
+        <Button
+          variant="outline"
           onPress={() =>
             router.replace({ pathname: '/session', params: { groupId: result.groupId } })
           }
           className="border-2 border-indigo-500 rounded-2xl py-3 px-8">
           <Text className="text-indigo-500 text-base font-semibold">View Session</Text>
-        </Pressable>
+        </Button>
       </View>
     );
   }
@@ -91,7 +97,7 @@ export default function CreateGroup() {
           Group Name
         </Text>
         <Input
-          className="mb-8"
+          className="mb-8 h-14 rounded-2xl border-2 border-gray-200 px-4 text-lg"
           placeholder="e.g. Friday Night"
           value={name}
           onChangeText={setName}
@@ -122,16 +128,11 @@ export default function CreateGroup() {
           ))}
         </View>
 
-        <Pressable
-          onPress={handleCreate}
-          disabled={!canCreate}
-          className={`rounded-2xl py-4 items-center ${
-            canCreate ? 'bg-indigo-500' : 'bg-gray-200'
-          }`}>
-          <Text className={`text-lg font-semibold ${canCreate ? 'text-white' : 'text-gray-400'}`}>
-            {isCreating ? 'Creating...' : 'Create Group'}
-          </Text>
-        </Pressable>
+        {error && <Text className="text-sm text-red-500 text-center mb-4">{error}</Text>}
+
+        <Button onPress={handleCreate} disabled={!canCreate} className="rounded-2xl py-4">
+          <Text>{isCreating ? 'Creating...' : 'Create Group'}</Text>
+        </Button>
       </View>
     </View>
   );

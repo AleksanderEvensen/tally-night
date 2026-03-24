@@ -1,28 +1,44 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import { useQuery, useMutation } from 'convex/react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useState } from 'react';
 
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Text } from '@/components/ui/text';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { useApp } from '@/lib/context';
+import { formatExpiry } from '@/lib/format';
 
-function formatExpiry(expires: number): string {
-  const now = Date.now();
-  const diff = expires - now;
-  if (diff <= 0) return 'Expired';
-  const hours = Math.floor(diff / 3_600_000);
-  const minutes = Math.floor((diff % 3_600_000) / 60_000);
-  if (hours > 24) return `${Math.floor(hours / 24)}d ${hours % 24}h left`;
-  if (hours > 0) return `${hours}h ${minutes}m left`;
-  return `${minutes}m left`;
-}
+type DialogState = {
+  open: boolean;
+  groupId: Id<'groups'> | null;
+  groupName: string;
+};
+
+const DIALOG_CLOSED: DialogState = { open: false, groupId: null, groupName: '' };
 
 export default function Groups() {
   const { dataConsent, convexUserId } = useApp();
   const { bottom } = useSafeAreaInsets();
   const router = useRouter();
+
+  const [leaveDialog, setLeaveDialog] = useState<DialogState>(DIALOG_CLOSED);
+  const [deleteDialog, setDeleteDialog] = useState<DialogState>(DIALOG_CLOSED);
 
   const groups = useQuery(
     api.groups.getMyGroups,
@@ -44,68 +60,49 @@ export default function Groups() {
           To use Groups, you need to consent to sharing your BAC and drink data. Your personal info
           (weight, gender, timestamps) is never shared.
         </Text>
-        <Pressable
-          onPress={() => router.push('/privacy')}
-          className="mt-6 bg-indigo-500 rounded-2xl py-3 px-8">
-          <Text className="text-white text-base font-semibold">Go to Data & Privacy</Text>
-        </Pressable>
+        <Button onPress={() => router.push('/privacy')} className="mt-6 rounded-2xl py-3 px-8">
+          <Text>Go to Data & Privacy</Text>
+        </Button>
       </View>
     );
   }
 
-  function confirmLeave(groupId: Id<'groups'>, groupName: string) {
-    Alert.alert('Leave Group', `Are you sure you want to leave "${groupName}"?`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Leave',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await leaveGroup({ groupId, userId: convexUserId as Id<'users'> });
-          } catch {
-            Alert.alert('Error', 'Could not leave group. Please try again.');
-          }
-        },
-      },
-    ]);
+  async function handleLeave() {
+    if (!leaveDialog.groupId) return;
+    try {
+      await leaveGroup({ groupId: leaveDialog.groupId, userId: convexUserId as Id<'users'> });
+    } catch {
+      // Mutation failure is visible via Convex's reactive queries
+    }
+    setLeaveDialog(DIALOG_CLOSED);
   }
 
-  function confirmDelete(groupId: Id<'groups'>, groupName: string) {
-    Alert.alert('Delete Group', `This will permanently delete "${groupName}" for all members.`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteGroup({ groupId, userId: convexUserId as Id<'users'> });
-          } catch {
-            Alert.alert('Error', 'Could not delete group. Please try again.');
-          }
-        },
-      },
-    ]);
+  async function handleDelete() {
+    if (!deleteDialog.groupId) return;
+    try {
+      await deleteGroup({ groupId: deleteDialog.groupId, userId: convexUserId as Id<'users'> });
+    } catch {
+      // Mutation failure is visible via Convex's reactive queries
+    }
+    setDeleteDialog(DIALOG_CLOSED);
   }
 
   return (
     <View className="flex flex-1 bg-white">
       <Stack.Screen options={{ title: 'Groups' }} />
       <ScrollView className="flex-1 px-6" contentContainerStyle={{ paddingBottom: bottom + 16 }}>
-        {/* Action buttons */}
         <View className="flex-row gap-3 pt-6 mb-6">
-          <Pressable
-            onPress={() => router.push('/create-group')}
-            className="flex-1 bg-indigo-500 rounded-2xl py-4 items-center">
-            <Text className="text-white text-base font-semibold">Create Group</Text>
-          </Pressable>
-          <Pressable
+          <Button onPress={() => router.push('/create-group')} className="flex-1 rounded-2xl py-4">
+            <Text>Create Group</Text>
+          </Button>
+          <Button
+            variant="outline"
             onPress={() => router.push('/join-group')}
-            className="flex-1 border-2 border-indigo-500 rounded-2xl py-4 items-center">
+            className="flex-1 border-2 border-indigo-500 rounded-2xl py-4">
             <Text className="text-indigo-500 text-base font-semibold">Join Group</Text>
-          </Pressable>
+          </Button>
         </View>
 
-        {/* Groups list */}
         {groups === undefined ? (
           <Text className="text-gray-400 text-center py-8">Loading...</Text>
         ) : groups.length === 0 ? (
@@ -118,40 +115,101 @@ export default function Groups() {
               key={group.groupId}
               onPress={() =>
                 router.push({ pathname: '/session', params: { groupId: group.groupId } })
-              }
-              className="bg-gray-50 rounded-2xl p-4 mb-3 border border-gray-200 active:bg-gray-100">
-              <View className="flex-row items-center justify-between mb-1">
-                <Text className="text-lg font-semibold text-gray-900 flex-1">{group.name}</Text>
-                <View className="flex-row gap-1">
-                  {group.memberType === 'admin' && (
+              }>
+              <Card className="mb-3 p-4 py-4 gap-1">
+                <View className="flex-row items-center justify-between mb-1">
+                  <Text className="text-lg font-semibold text-gray-900 flex-1">{group.name}</Text>
+                  <View className="flex-row gap-1">
+                    {group.memberType === 'admin' && (
+                      <Pressable
+                        onPress={() =>
+                          setDeleteDialog({
+                            open: true,
+                            groupId: group.groupId,
+                            groupName: group.name,
+                          })
+                        }
+                        hitSlop={6}
+                        className="p-2">
+                        <Ionicons name="trash-outline" size={18} color="#ef4444" />
+                      </Pressable>
+                    )}
                     <Pressable
-                      onPress={() => confirmDelete(group.groupId, group.name)}
+                      onPress={() =>
+                        setLeaveDialog({
+                          open: true,
+                          groupId: group.groupId,
+                          groupName: group.name,
+                        })
+                      }
                       hitSlop={6}
                       className="p-2">
-                      <Ionicons name="trash-outline" size={18} color="#ef4444" />
+                      <Ionicons name="exit-outline" size={18} color="#6b7280" />
                     </Pressable>
-                  )}
-                  <Pressable
-                    onPress={() => confirmLeave(group.groupId, group.name)}
-                    hitSlop={6}
-                    className="p-2">
-                    <Ionicons name="exit-outline" size={18} color="#6b7280" />
-                  </Pressable>
+                  </View>
                 </View>
-              </View>
-              <View className="flex-row items-center gap-3">
-                <Text className="text-sm text-gray-400">Code: {group.joinCode}</Text>
-                <Text className="text-sm text-gray-400">{formatExpiry(group.expires)}</Text>
-              </View>
-              {group.memberType === 'admin' && (
-                <View className="bg-indigo-100 self-start px-2 py-0.5 rounded-full mt-2">
-                  <Text className="text-xs font-medium text-indigo-600">Admin</Text>
+                <View className="flex-row items-center gap-3">
+                  <Text className="text-sm text-gray-400">Code: {group.joinCode}</Text>
+                  <Text className="text-sm text-gray-400">{formatExpiry(group.expires)}</Text>
                 </View>
-              )}
+                {group.memberType === 'admin' && (
+                  <Badge
+                    variant="secondary"
+                    className="self-start mt-2 bg-indigo-100 border-indigo-100">
+                    <Text className="text-xs font-medium text-indigo-600">Admin</Text>
+                  </Badge>
+                )}
+              </Card>
             </Pressable>
           ))
         )}
       </ScrollView>
+
+      <AlertDialog
+        open={leaveDialog.open}
+        onOpenChange={(open) => {
+          if (!open) setLeaveDialog(DIALOG_CLOSED);
+        }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave Group</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to leave &quot;{leaveDialog.groupName}&quot;?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onPress={() => setLeaveDialog(DIALOG_CLOSED)}>
+              <Text>Cancel</Text>
+            </AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive" onPress={handleLeave}>
+              <Text className="text-white">Leave</Text>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => {
+          if (!open) setDeleteDialog(DIALOG_CLOSED);
+        }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Group</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete &quot;{deleteDialog.groupName}&quot; for all members.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onPress={() => setDeleteDialog(DIALOG_CLOSED)}>
+              <Text>Cancel</Text>
+            </AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive" onPress={handleDelete}>
+              <Text className="text-white">Delete</Text>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </View>
   );
 }

@@ -1,9 +1,11 @@
 import { Stack, useRouter } from 'expo-router';
 import { useMutation } from 'convex/react';
 import { useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { View } from 'react-native';
 
-import { Input } from '@/components/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { useApp } from '@/lib/context';
@@ -13,6 +15,7 @@ export default function JoinGroup() {
   const router = useRouter();
   const [code, setCode] = useState('');
   const [isJoining, setIsJoining] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const joinGroup = useMutation(api.groups.joinGroup);
 
@@ -22,6 +25,7 @@ export default function JoinGroup() {
   async function handleJoin() {
     if (!canJoin || !convexUserId) return;
     setIsJoining(true);
+    setError(null);
 
     try {
       const res = await joinGroup({
@@ -29,10 +33,10 @@ export default function JoinGroup() {
         userId: convexUserId as Id<'users'>,
       });
       router.replace({ pathname: '/session', params: { groupId: res.groupId } });
-    } catch (error) {
+    } catch (err) {
       const message =
-        error instanceof Error ? error.message : 'Could not join group. Please try again.';
-      Alert.alert('Error', message);
+        err instanceof Error ? err.message : 'Could not join group. Please try again.';
+      setError(message);
     } finally {
       setIsJoining(false);
     }
@@ -67,16 +71,11 @@ export default function JoinGroup() {
           Ask the group creator for the 6-character code
         </Text>
 
-        <Pressable
-          onPress={handleJoin}
-          disabled={!canJoin}
-          className={`rounded-2xl py-4 items-center w-full ${
-            canJoin ? 'bg-indigo-500' : 'bg-gray-200'
-          }`}>
-          <Text className={`text-lg font-semibold ${canJoin ? 'text-white' : 'text-gray-400'}`}>
-            {isJoining ? 'Joining...' : 'Join Group'}
-          </Text>
-        </Pressable>
+        {error && <Text className="text-sm text-red-500 text-center mb-4">{error}</Text>}
+
+        <Button onPress={handleJoin} disabled={!canJoin} className="rounded-2xl py-4 w-full">
+          <Text>{isJoining ? 'Joining...' : 'Join Group'}</Text>
+        </Button>
       </View>
     </View>
   );
