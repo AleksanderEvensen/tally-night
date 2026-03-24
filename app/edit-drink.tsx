@@ -1,10 +1,13 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Input } from '@/components/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
 import { DRINK_TYPE_EMOJI, DRINK_TYPE_LABEL, DRINK_TYPES, type DrinkType } from '@/lib/bac';
 import { useApp } from '@/lib/context';
 import { formatTime } from '@/lib/format';
@@ -60,11 +63,9 @@ export default function EditDrink() {
         {/* Time selector */}
         <View className="flex-row items-center justify-between mb-6 bg-gray-50 rounded-xl p-3">
           <Text className="text-sm text-gray-500">Time</Text>
-          <Pressable
-            onPress={() => setShowTimePicker(true)}
-            className="bg-white border border-gray-200 rounded-lg px-4 py-2">
+          <Button variant="outline" onPress={() => setShowTimePicker(true)} className="px-4 py-2">
             <Text className="text-base font-medium text-indigo-600">{formatTime(drinkTime)}</Text>
-          </Pressable>
+          </Button>
         </View>
 
         {showTimePicker && (
@@ -77,63 +78,60 @@ export default function EditDrink() {
               maximumDate={new Date()}
             />
             {Platform.OS === 'ios' && (
-              <Pressable
+              <Button
                 onPress={() => setShowTimePicker(false)}
                 className="self-center mt-2 px-6 py-2 bg-indigo-500 rounded-lg">
                 <Text className="text-white font-medium">Done</Text>
-              </Pressable>
+              </Button>
             )}
           </View>
         )}
 
-        <Text className="text-sm text-gray-500 mb-2">Type</Text>
+        <Label className="text-sm text-gray-500 mb-2">Type</Label>
         <View className="flex-row flex-wrap gap-2 mb-4">
           {DRINK_TYPES.map((t) => (
-            <Pressable
+            <Button
               key={t}
+              variant={type === t ? 'default' : 'outline'}
               onPress={() => setType(t)}
-              className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl border-2 ${
-                type === t ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'
+              className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl ${
+                type === t ? 'bg-indigo-500' : ''
               }`}>
               <Text className="text-base">{DRINK_TYPE_EMOJI[t]}</Text>
               <Text
-                className={`text-sm font-medium ${
-                  type === t ? 'text-indigo-600' : 'text-gray-600'
-                }`}>
+                className={`text-sm font-medium ${type === t ? 'text-white' : 'text-gray-600'}`}>
                 {DRINK_TYPE_LABEL[t]}
               </Text>
-            </Pressable>
+            </Button>
           ))}
         </View>
 
-        <Text className="text-sm text-gray-500 mb-1">Volume (ml)</Text>
+        <Label className="text-sm text-gray-500 mb-1">Volume (ml)</Label>
         <Input
-          size="compact"
-          className="mb-3"
+          className="mb-3 h-9"
           placeholder="e.g. 330"
           keyboardType="numeric"
           value={volume}
           onChangeText={setVolume}
         />
 
-        <Text className="text-sm text-gray-500 mb-1">Alcohol %</Text>
+        <Label className="text-sm text-gray-500 mb-1">Alcohol %</Label>
         <Input
-          size="compact"
-          className="mb-4"
+          className="mb-4 h-9"
           placeholder="e.g. 5"
           keyboardType="numeric"
           value={percent}
           onChangeText={setPercent}
         />
 
-        <Pressable
+        <Button
           onPress={handleSave}
           disabled={!canSave}
-          className={`rounded-xl py-4 items-center ${canSave ? 'bg-indigo-500' : 'bg-gray-200'}`}>
+          className={`rounded-xl py-4 ${canSave ? 'bg-indigo-500' : 'bg-gray-200'}`}>
           <Text className={`text-base font-semibold ${canSave ? 'text-white' : 'text-gray-400'}`}>
             Save Changes
           </Text>
-        </Pressable>
+        </Button>
       </ScrollView>
     </View>
   );

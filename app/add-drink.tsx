@@ -1,11 +1,15 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Platform, Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Input } from '@/components/Input';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
 import {
   DRINK_TYPE_EMOJI,
   DRINK_TYPE_LABEL,
@@ -70,11 +74,9 @@ export default function AddDrink() {
         {/* Time selector */}
         <View className="flex-row items-center justify-between mb-6 bg-gray-50 rounded-xl p-3">
           <Text className="text-sm text-gray-500">Time</Text>
-          <Pressable
-            onPress={() => setShowTimePicker(true)}
-            className="bg-white border border-gray-200 rounded-lg px-4 py-2">
+          <Button variant="outline" onPress={() => setShowTimePicker(true)} className="px-4 py-2">
             <Text className="text-base font-medium text-indigo-600">{formatTime(drinkTime)}</Text>
-          </Pressable>
+          </Button>
         </View>
 
         {showTimePicker && (
@@ -87,11 +89,11 @@ export default function AddDrink() {
               maximumDate={new Date()}
             />
             {Platform.OS === 'ios' && (
-              <Pressable
+              <Button
                 onPress={() => setShowTimePicker(false)}
                 className="self-center mt-2 px-6 py-2 bg-indigo-500 rounded-lg">
                 <Text className="text-white font-medium">Done</Text>
-              </Pressable>
+              </Button>
             )}
           </View>
         )}
@@ -102,17 +104,16 @@ export default function AddDrink() {
         </Text>
         <View className="flex-row flex-wrap gap-4 mb-6">
           {drinkPresets.map((preset) => (
-            <Pressable
-              key={preset.id}
-              onPress={() => handleSelect(preset)}
-              className="w-[47%] border-2 border-gray-200 rounded-2xl p-4 items-center active:border-indigo-400 active:bg-indigo-50">
-              <Text className="text-4xl mb-2">{preset.emoji}</Text>
-              <Text className="text-base font-semibold text-gray-800 text-center">
-                {preset.name}
-              </Text>
-              <Text className="text-sm text-gray-400 mt-1">
-                {preset.volumeMl}ml · {preset.alcoholPercent}%
-              </Text>
+            <Pressable key={preset.id} onPress={() => handleSelect(preset)} className="w-[47%]">
+              <Card className="p-4 items-center active:border-indigo-400 active:bg-indigo-50">
+                <Text className="text-4xl mb-2">{preset.emoji}</Text>
+                <Text className="text-base font-semibold text-gray-800 text-center">
+                  {preset.name}
+                </Text>
+                <Text variant="muted" className="mt-1">
+                  {preset.volumeMl}ml · {preset.alcoholPercent}%
+                </Text>
+              </Card>
             </Pressable>
           ))}
         </View>
@@ -129,61 +130,58 @@ export default function AddDrink() {
             <Text className="text-base text-gray-500">Tap to enter a custom drink</Text>
           </Pressable>
         ) : (
-          <View className="border-2 border-gray-200 rounded-2xl p-4">
-            <Text className="text-sm text-gray-500 mb-2">Type</Text>
+          <Card className="p-4">
+            <Label className="text-sm text-gray-500 mb-2">Type</Label>
             <View className="flex-row flex-wrap gap-2 mb-4">
               {DRINK_TYPES.map((t) => (
-                <Pressable
+                <Button
                   key={t}
+                  variant={customType === t ? 'default' : 'outline'}
                   onPress={() => setCustomType(t)}
-                  className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl border-2 ${
-                    customType === t ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'
+                  className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl ${
+                    customType === t ? 'bg-indigo-500' : ''
                   }`}>
                   <Text className="text-base">{DRINK_TYPE_EMOJI[t]}</Text>
                   <Text
                     className={`text-sm font-medium ${
-                      customType === t ? 'text-indigo-600' : 'text-gray-600'
+                      customType === t ? 'text-white' : 'text-gray-600'
                     }`}>
                     {DRINK_TYPE_LABEL[t]}
                   </Text>
-                </Pressable>
+                </Button>
               ))}
             </View>
 
-            <Text className="text-sm text-gray-500 mb-1">Volume (ml)</Text>
+            <Label className="text-sm text-gray-500 mb-1">Volume (ml)</Label>
             <Input
-              size="compact"
-              className="mb-3"
+              className="mb-3 h-9"
               placeholder="e.g. 330"
               keyboardType="numeric"
               value={customVolume}
               onChangeText={setCustomVolume}
             />
 
-            <Text className="text-sm text-gray-500 mb-1">Alcohol %</Text>
+            <Label className="text-sm text-gray-500 mb-1">Alcohol %</Label>
             <Input
-              size="compact"
-              className="mb-4"
+              className="mb-4 h-9"
               placeholder="e.g. 5"
               keyboardType="numeric"
               value={customPercent}
               onChangeText={setCustomPercent}
             />
 
-            <Pressable
+            <Button
               onPress={handleCustomSubmit}
               disabled={!canSubmitCustom}
-              className={`rounded-xl py-3 items-center ${
-                canSubmitCustom ? 'bg-indigo-500' : 'bg-gray-200'
-              }`}>
+              className={`rounded-xl py-3 ${canSubmitCustom ? 'bg-indigo-500' : 'bg-gray-200'}`}>
               <Text
                 className={`text-base font-semibold ${
                   canSubmitCustom ? 'text-white' : 'text-gray-400'
                 }`}>
                 Add Drink
               </Text>
-            </Pressable>
-          </View>
+            </Button>
+          </Card>
         )}
       </KeyboardAwareScrollView>
     </View>
