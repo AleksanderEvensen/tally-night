@@ -7,14 +7,15 @@ import { useApp } from '@/lib/context';
 export default function Onboarding() {
   const { setUserInfo } = useApp();
   const router = useRouter();
+  const [name, setName] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | null>(null);
   const [weight, setWeight] = useState('');
 
-  const canContinue = gender !== null && Number(weight) > 0;
+  const canContinue = name.trim().length >= 2 && gender !== null && Number(weight) > 0;
 
   async function handleContinue() {
     if (!gender || !canContinue) return;
-    await setUserInfo({ gender, weightInKg: Number(weight) });
+    await setUserInfo({ name: name.trim(), gender, weightInKg: Number(weight) });
     router.replace('/');
   }
 
@@ -28,6 +29,19 @@ export default function Onboarding() {
           We need a few details to estimate your blood alcohol level. Everything stays on your
           device.
         </Text>
+
+        <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+          Name
+        </Text>
+        <TextInput
+          className="border-2 border-gray-200 rounded-2xl px-4 py-4 text-lg text-gray-900 mb-8"
+          placeholder="At least 2 characters"
+          placeholderTextColor="#9ca3af"
+          value={name}
+          onChangeText={setName}
+          autoCapitalize="words"
+          autoComplete="name"
+        />
 
         <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
           Gender

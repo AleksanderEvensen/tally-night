@@ -1,5 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { createMMKV } from 'react-native-mmkv';
 import type { Drink, StomachStatus, UserInfo, WaterEntry } from './bac';
 
 const KEYS = {
@@ -21,28 +20,32 @@ interface StoredWater {
   volumeMl: number;
 }
 
-export async function saveUserInfo(info: UserInfo): Promise<void> {
-  await AsyncStorage.setItem(KEYS.USER_INFO, JSON.stringify(info));
+export const storage = createMMKV({
+  id: 'unlucky-bac',
+});
+
+export function saveUserInfo(info: UserInfo): void {
+  storage.set(KEYS.USER_INFO, JSON.stringify(info));
 }
 
-export async function loadUserInfo(): Promise<UserInfo | null> {
-  const raw = await AsyncStorage.getItem(KEYS.USER_INFO);
+export function loadUserInfo(): UserInfo | null {
+  const raw = storage.getString(KEYS.USER_INFO);
   if (!raw) return null;
   return JSON.parse(raw) as UserInfo;
 }
 
-export async function saveDrinks(drinks: Drink[]): Promise<void> {
+export function saveDrinks(drinks: Drink[]): void {
   const stored: StoredDrink[] = drinks.map((d) => ({
     time: d.time.toISOString(),
     type: d.type,
     volumeMl: d.volumeMl,
     alcoholPercent: d.alcoholPercent,
   }));
-  await AsyncStorage.setItem(KEYS.DRINKS, JSON.stringify(stored));
+  storage.set(KEYS.DRINKS, JSON.stringify(stored));
 }
 
-export async function loadDrinks(): Promise<Drink[]> {
-  const raw = await AsyncStorage.getItem(KEYS.DRINKS);
+export function loadDrinks(): Drink[] {
+  const raw = storage.getString(KEYS.DRINKS);
   if (!raw) return [];
   const stored = JSON.parse(raw) as StoredDrink[];
   return stored.map((d) => ({
@@ -51,16 +54,16 @@ export async function loadDrinks(): Promise<Drink[]> {
   }));
 }
 
-export async function saveWaterEntries(entries: WaterEntry[]): Promise<void> {
+export function saveWaterEntries(entries: WaterEntry[]): void {
   const stored: StoredWater[] = entries.map((w) => ({
     time: w.time.toISOString(),
     volumeMl: w.volumeMl,
   }));
-  await AsyncStorage.setItem(KEYS.WATER, JSON.stringify(stored));
+  storage.set(KEYS.WATER, JSON.stringify(stored));
 }
 
-export async function loadWaterEntries(): Promise<WaterEntry[]> {
-  const raw = await AsyncStorage.getItem(KEYS.WATER);
+export function loadWaterEntries(): WaterEntry[] {
+  const raw = storage.getString(KEYS.WATER);
   if (!raw) return [];
   const stored = JSON.parse(raw) as StoredWater[];
   return stored.map((w) => ({
@@ -69,12 +72,12 @@ export async function loadWaterEntries(): Promise<WaterEntry[]> {
   }));
 }
 
-export async function saveStomachStatus(status: StomachStatus): Promise<void> {
-  await AsyncStorage.setItem(KEYS.STOMACH_STATUS, status);
+export function saveStomachStatus(status: StomachStatus): void {
+  storage.set(KEYS.STOMACH_STATUS, status);
 }
 
-export async function loadStomachStatus(): Promise<StomachStatus> {
-  const raw = await AsyncStorage.getItem(KEYS.STOMACH_STATUS);
+export function loadStomachStatus(): StomachStatus {
+  const raw = storage.getString(KEYS.STOMACH_STATUS);
   if (raw === 'empty' || raw === 'moderate' || raw === 'full') return raw;
   return 'moderate';
 }

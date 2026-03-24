@@ -88,6 +88,7 @@ export interface WaterEntry {
 }
 
 export interface UserInfo {
+  name: string;
   gender: 'male' | 'female';
   weightInKg: number;
 }
