@@ -3,7 +3,7 @@ import { useMutation } from 'convex/react';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { Input } from '@/components/Input';
+import { Input } from '@/components/ui/input';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { useApp } from '@/lib/context';

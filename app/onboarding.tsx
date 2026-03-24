@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Input } from '@/components/Input';
+import { Input } from '@/components/ui/input';
 import { useApp } from '@/lib/context';
 
 export default function Onboarding() {

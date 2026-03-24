@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 
-import { Input } from '@/components/Input';
+import { Input } from '@/components/ui/input';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { useApp } from '@/lib/context';

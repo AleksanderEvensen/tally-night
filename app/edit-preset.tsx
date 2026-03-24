@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Input } from '@/components/Input';
+import { Input } from '@/components/ui/input';
 import { DRINK_TYPE_EMOJI, DRINK_TYPE_LABEL, DRINK_TYPES } from '@/lib/bac';
 import { useApp } from '@/lib/context';
 import type { DrinkPreset } from '@/lib/drink-presets';

@@ -1,5 +1,7 @@
 import { forwardRef } from 'react';
-import { TextInput, TextInputProps, View } from 'react-native';
+import { TextInput, type TextInputProps, View } from 'react-native';
+
+import { cn } from '@/lib/cn';
 
 type InputSize = 'default' | 'compact';
 
@@ -21,12 +23,12 @@ const SIZE_STYLES = {
   },
 } as const;
 
-export const Input = forwardRef<TextInput, InputProps>(
+const Input = forwardRef<TextInput, InputProps>(
   ({ size = 'default', className, style, ...props }, ref) => {
     const s = SIZE_STYLES[size];
 
     return (
-      <View className={`${s.container} ${className ?? ''}`}>
+      <View className={cn(s.container, className)}>
         <TextInput
           ref={ref}
           className={s.input}
@@ -40,3 +42,6 @@ export const Input = forwardRef<TextInput, InputProps>(
 );
 
 Input.displayName = 'Input';
+
+export { Input };
+export type { InputProps };

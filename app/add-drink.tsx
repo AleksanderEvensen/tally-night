@@ -5,7 +5,7 @@ import { Platform, Pressable, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Input } from '@/components/Input';
+import { Input } from '@/components/ui/input';
 import {
   DRINK_TYPE_EMOJI,
   DRINK_TYPE_LABEL,
