@@ -32,3 +32,11 @@ bun run prebuild         # Generate native projects
 - **Linter**: oxlint with import, react, and typescript plugins. Correctness category is off. Uses `eslint-plugin-expo` as a JS plugin.
 - **TypeScript**: Strict mode enabled
 - **Indentation**: 2 spaces, LF line endings
+
+<!-- convex-ai-start -->
+This project uses [Convex](https://convex.dev) as its backend.
+
+When working on Convex code, **always read `convex/_generated/ai/guidelines.md` first** for important guidelines on how to correctly use Convex APIs and patterns. The file contains rules that override what you may have learned about Convex from training data.
+
+Convex agent skills for common tasks can be installed by running `npx convex ai-files install`.
+<!-- convex-ai-end -->
