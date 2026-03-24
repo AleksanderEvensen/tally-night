@@ -1,7 +1,22 @@
 import { Stack, useRouter } from 'expo-router';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import * as React from 'react';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Text } from '@/components/ui/text';
 import { useApp } from '@/lib/context';
 import { DEFAULT_DRINK_PRESETS } from '@/lib/drink-presets';
 
@@ -10,34 +25,18 @@ export default function DrinkPresets() {
   const router = useRouter();
   const { bottom } = useSafeAreaInsets();
 
+  const [deleteIndex, setDeleteIndex] = React.useState<number | null>(null);
+  const [showResetDialog, setShowResetDialog] = React.useState(false);
+
   function handleDelete(index: number) {
-    const preset = drinkPresets[index];
-    Alert.alert('Delete Preset', `Remove "${preset.name}"?`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => {
-          const updated = drinkPresets.filter((_, i) => i !== index);
-          setDrinkPresets(updated);
-        },
-      },
-    ]);
+    const updated = drinkPresets.filter((_, i) => i !== index);
+    setDrinkPresets(updated);
+    setDeleteIndex(null);
   }
 
   function handleResetDefaults() {
-    Alert.alert(
-      'Reset to Defaults',
-      'This will replace all your presets with the original defaults.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Reset',
-          style: 'destructive',
-          onPress: () => setDrinkPresets(DEFAULT_DRINK_PRESETS),
-        },
-      ]
-    );
+    setDrinkPresets(DEFAULT_DRINK_PRESETS);
+    setShowResetDialog(false);
   }
 
   return (
@@ -46,52 +45,96 @@ export default function DrinkPresets() {
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 24, paddingBottom: bottom + 24 }}>
-        <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Text variant="small" className="text-muted-foreground mb-3 uppercase tracking-wide">
           Your Presets
         </Text>
 
         {drinkPresets.length === 0 && (
           <View className="border-2 border-dashed border-gray-300 rounded-2xl py-8 items-center mb-4">
-            <Text className="text-gray-400 text-base">No presets yet</Text>
+            <Text className="text-muted-foreground">No presets yet</Text>
           </View>
         )}
 
         {drinkPresets.map((preset, index) => (
-          <View
-            key={preset.id}
-            className="flex-row items-center border-2 border-gray-200 rounded-2xl p-4 mb-3">
-            <Text className="text-3xl mr-3">{preset.emoji}</Text>
-            <Pressable
-              className="flex-1"
-              onPress={() => router.push(`/edit-preset?index=${index}`)}>
-              <Text className="text-base font-semibold text-gray-800">{preset.name}</Text>
-              <Text className="text-sm text-gray-400">
-                {preset.volumeMl}ml · {preset.alcoholPercent}%
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => handleDelete(index)}
-              className="ml-2 w-10 h-10 items-center justify-center rounded-xl bg-gray-100 active:bg-red-100">
-              <Text className="text-lg text-gray-400">✕</Text>
-            </Pressable>
-          </View>
+          <React.Fragment key={preset.id}>
+            <Card className="flex-row items-center p-4 mb-0 gap-0 rounded-2xl shadow-none">
+              <Text className="text-3xl mr-3">{preset.emoji}</Text>
+              <Pressable
+                className="flex-1"
+                onPress={() => router.push(`/edit-preset?index=${index}`)}>
+                <Text className="text-base font-semibold">{preset.name}</Text>
+                <Text variant="muted">
+                  {preset.volumeMl}ml · {preset.alcoholPercent}%
+                </Text>
+              </Pressable>
+              <Button
+                variant="ghost"
+                size="icon"
+                onPress={() => setDeleteIndex(index)}
+                className="ml-2">
+                <Text className="text-lg text-muted-foreground">✕</Text>
+              </Button>
+            </Card>
+            {index < drinkPresets.length - 1 && <Separator className="my-3" />}
+            {index === drinkPresets.length - 1 && <View className="mb-3" />}
+          </React.Fragment>
         ))}
 
-        {/* Add new preset */}
-        <Pressable
+        <Button
+          variant="outline"
           onPress={() => router.push('/edit-preset')}
-          className="border-2 border-dashed border-gray-300 rounded-2xl py-5 items-center mb-6 active:border-indigo-400 active:bg-indigo-50">
+          className="border-2 border-dashed border-gray-300 rounded-2xl py-5 mb-6 h-auto flex-col">
           <Text className="text-2xl mb-1">+</Text>
-          <Text className="text-base text-gray-500">Add New Preset</Text>
-        </Pressable>
+          <Text className="text-muted-foreground">Add New Preset</Text>
+        </Button>
 
-        {/* Reset to defaults */}
-        <Pressable
-          onPress={handleResetDefaults}
-          className="rounded-2xl py-4 items-center border-2 border-gray-200 active:bg-gray-50">
-          <Text className="text-base font-semibold text-gray-600">Reset to Defaults</Text>
-        </Pressable>
+        <Button
+          variant="outline"
+          onPress={() => setShowResetDialog(true)}
+          className="rounded-2xl py-4 h-auto">
+          <Text className="text-base font-semibold text-muted-foreground">Reset to Defaults</Text>
+        </Button>
       </ScrollView>
+
+      <AlertDialog open={deleteIndex !== null} onOpenChange={() => setDeleteIndex(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Preset</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteIndex !== null ? `Remove "${drinkPresets[deleteIndex]?.name}"?` : ''}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onPress={() => setDeleteIndex(null)}>
+              <Text>Cancel</Text>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive"
+              onPress={() => deleteIndex !== null && handleDelete(deleteIndex)}>
+              <Text>Delete</Text>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset to Defaults</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will replace all your presets with the original defaults.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onPress={() => setShowResetDialog(false)}>
+              <Text>Cancel</Text>
+            </AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive" onPress={handleResetDefaults}>
+              <Text>Reset</Text>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </View>
   );
 }
