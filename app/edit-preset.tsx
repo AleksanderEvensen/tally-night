@@ -1,9 +1,12 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Input } from '@/components/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
 import { DRINK_TYPE_EMOJI, DRINK_TYPE_LABEL, DRINK_TYPES } from '@/lib/bac';
 import { useApp } from '@/lib/context';
 import type { DrinkPreset } from '@/lib/drink-presets';
@@ -56,7 +59,7 @@ export default function EditPreset() {
     return (
       <View className="flex flex-1 bg-white items-center justify-center">
         <Stack.Screen options={{ title: 'Edit Preset' }} />
-        <Text className="text-gray-400">Preset not found.</Text>
+        <Text className="text-muted-foreground">Preset not found.</Text>
       </View>
     );
   }
@@ -68,8 +71,7 @@ export default function EditPreset() {
         className="flex-1"
         contentContainerStyle={{ padding: 24, paddingBottom: bottom + 24 }}
         keyboardShouldPersistTaps="handled">
-        {/* Emoji picker */}
-        <Text className="text-sm text-gray-500 mb-2">Emoji</Text>
+        <Label className="mb-2">Emoji</Label>
         <View className="flex-row flex-wrap gap-2 mb-4">
           {EMOJI_OPTIONS.map((e) => (
             <Pressable
@@ -83,18 +85,10 @@ export default function EditPreset() {
           ))}
         </View>
 
-        {/* Name */}
-        <Text className="text-sm text-gray-500 mb-1">Name</Text>
-        <Input
-          size="compact"
-          className="mb-3"
-          placeholder="e.g. IPA Pint"
-          value={name}
-          onChangeText={setName}
-        />
+        <Label className="mb-1">Name</Label>
+        <Input className="mb-3" placeholder="e.g. IPA Pint" value={name} onChangeText={setName} />
 
-        {/* Type */}
-        <Text className="text-sm text-gray-500 mb-2">Type</Text>
+        <Label className="mb-2">Type</Label>
         <View className="flex-row flex-wrap gap-2 mb-4">
           {DRINK_TYPES.map((t) => (
             <Pressable
@@ -105,7 +99,7 @@ export default function EditPreset() {
               }`}>
               <Text
                 className={`text-sm font-medium ${
-                  type === t ? 'text-indigo-600' : 'text-gray-600'
+                  type === t ? 'text-indigo-600' : 'text-muted-foreground'
                 }`}>
                 {DRINK_TYPE_LABEL[t]}
               </Text>
@@ -113,10 +107,8 @@ export default function EditPreset() {
           ))}
         </View>
 
-        {/* Volume */}
-        <Text className="text-sm text-gray-500 mb-1">Volume (ml)</Text>
+        <Label className="mb-1">Volume (ml)</Label>
         <Input
-          size="compact"
           className="mb-3"
           placeholder="e.g. 330"
           keyboardType="numeric"
@@ -124,10 +116,8 @@ export default function EditPreset() {
           onChangeText={setVolume}
         />
 
-        {/* Alcohol % */}
-        <Text className="text-sm text-gray-500 mb-1">Alcohol %</Text>
+        <Label className="mb-1">Alcohol %</Label>
         <Input
-          size="compact"
           className="mb-6"
           placeholder="e.g. 5"
           keyboardType="numeric"
@@ -135,14 +125,11 @@ export default function EditPreset() {
           onChangeText={setPercent}
         />
 
-        <Pressable
-          onPress={handleSave}
-          disabled={!canSave}
-          className={`rounded-xl py-4 items-center ${canSave ? 'bg-indigo-500' : 'bg-gray-200'}`}>
-          <Text className={`text-base font-semibold ${canSave ? 'text-white' : 'text-gray-400'}`}>
+        <Button onPress={handleSave} disabled={!canSave} className="rounded-xl py-4 h-auto">
+          <Text className="text-base font-semibold">
             {isEditing ? 'Save Changes' : 'Add Preset'}
           </Text>
-        </Pressable>
+        </Button>
       </ScrollView>
     </View>
   );
