@@ -1,9 +1,14 @@
 import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Input } from '@/components/Input';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
+import { cn } from '@/lib/utils';
 import { useApp } from '@/lib/context';
 
 export default function Onboarding() {
@@ -39,11 +44,11 @@ export default function Onboarding() {
             device.
           </Text>
 
-          <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+          <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
             Name
-          </Text>
+          </Label>
           <Input
-            className="mb-8"
+            className="mb-8 h-14 rounded-2xl border-2 border-gray-200 px-4 text-lg"
             placeholder="At least 2 characters"
             value={name}
             onChangeText={setName}
@@ -51,42 +56,47 @@ export default function Onboarding() {
             autoComplete="name"
           />
 
-          <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+          <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
             Gender
-          </Text>
+          </Label>
           <View className="flex-row gap-3 mb-8">
             <Pressable
               onPress={() => setGender('male')}
-              className={`flex-1 py-4 rounded-2xl items-center border-2 ${
+              className={cn(
+                'flex-1 py-4 rounded-2xl items-center border-2',
                 gender === 'male' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
-              }`}>
+              )}>
               <Text className="text-2xl mb-1">♂</Text>
               <Text
-                className={`text-base font-semibold ${
+                className={cn(
+                  'text-base font-semibold',
                   gender === 'male' ? 'text-indigo-600' : 'text-gray-600'
-                }`}>
+                )}>
                 Male
               </Text>
             </Pressable>
             <Pressable
               onPress={() => setGender('female')}
-              className={`flex-1 py-4 rounded-2xl items-center border-2 ${
+              className={cn(
+                'flex-1 py-4 rounded-2xl items-center border-2',
                 gender === 'female' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
-              }`}>
+              )}>
               <Text className="text-2xl mb-1">♀</Text>
               <Text
-                className={`text-base font-semibold ${
+                className={cn(
+                  'text-base font-semibold',
                   gender === 'female' ? 'text-indigo-600' : 'text-gray-600'
-                }`}>
+                )}>
                 Female
               </Text>
             </Pressable>
           </View>
 
-          <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+          <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
             Weight (kg)
-          </Text>
+          </Label>
           <Input
+            className="h-14 rounded-2xl border-2 border-gray-200 px-4 text-lg"
             placeholder="e.g. 75"
             keyboardType="numeric"
             value={weight}
@@ -98,12 +108,11 @@ export default function Onboarding() {
             <Pressable
               onPress={() => setAgeConfirmed(!ageConfirmed)}
               className="flex-row items-start gap-3">
-              <View
-                className={`w-6 h-6 rounded-lg border-2 items-center justify-center mt-0.5 ${
-                  ageConfirmed ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300 bg-white'
-                }`}>
-                {ageConfirmed && <Text className="text-white text-xs font-bold">✓</Text>}
-              </View>
+              <Checkbox
+                checked={ageConfirmed}
+                onCheckedChange={(val) => setAgeConfirmed(val === true)}
+                className="mt-0.5"
+              />
               <Text className="flex-1 text-sm text-gray-700 leading-5">
                 I confirm that I am of legal drinking age in my country
               </Text>
@@ -118,17 +127,15 @@ export default function Onboarding() {
             </View>
           </View>
 
-          <Pressable
+          <Button
             onPress={handleContinue}
             disabled={!canContinue}
-            className={`mt-6 rounded-2xl py-4 items-center ${
-              canContinue ? 'bg-indigo-500' : 'bg-gray-200'
-            }`}>
+            className={cn('mt-6 rounded-2xl py-4', canContinue ? 'bg-indigo-500' : 'bg-gray-200')}>
             <Text
-              className={`text-lg font-semibold ${canContinue ? 'text-white' : 'text-gray-400'}`}>
+              className={cn('text-lg font-semibold', canContinue ? 'text-white' : 'text-gray-400')}>
               Continue
             </Text>
-          </Pressable>
+          </Button>
         </View>
       </ScrollView>
     </View>

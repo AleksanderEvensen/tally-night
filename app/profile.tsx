@@ -1,9 +1,13 @@
 import { Stack, useRouter } from 'expo-router';
 import { useMutation } from 'convex/react';
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { Input } from '@/components/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
+import { cn } from '@/lib/utils';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { useApp } from '@/lib/context';
@@ -40,11 +44,11 @@ export default function Profile() {
       <Stack.Screen options={{ title: 'Profile' }} />
 
       <View className="pt-8">
-        <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
           Name
-        </Text>
+        </Label>
         <Input
-          className="mb-8"
+          className="mb-8 h-14 rounded-2xl border-2 border-gray-200 px-4 text-lg"
           placeholder="At least 2 characters"
           value={name}
           onChangeText={setName}
@@ -52,70 +56,75 @@ export default function Profile() {
           autoComplete="name"
         />
 
-        <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
           Gender
-        </Text>
+        </Label>
         <View className="flex-row gap-3 mb-8">
           <Pressable
             onPress={() => setGender('male')}
-            className={`flex-1 py-4 rounded-2xl items-center border-2 ${
+            className={cn(
+              'flex-1 py-4 rounded-2xl items-center border-2',
               gender === 'male' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
-            }`}>
+            )}>
             <Text className="text-2xl mb-1">♂</Text>
             <Text
-              className={`text-base font-semibold ${
+              className={cn(
+                'text-base font-semibold',
                 gender === 'male' ? 'text-indigo-600' : 'text-gray-600'
-              }`}>
+              )}>
               Male
             </Text>
           </Pressable>
           <Pressable
             onPress={() => setGender('female')}
-            className={`flex-1 py-4 rounded-2xl items-center border-2 ${
+            className={cn(
+              'flex-1 py-4 rounded-2xl items-center border-2',
               gender === 'female' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
-            }`}>
+            )}>
             <Text className="text-2xl mb-1">♀</Text>
             <Text
-              className={`text-base font-semibold ${
+              className={cn(
+                'text-base font-semibold',
                 gender === 'female' ? 'text-indigo-600' : 'text-gray-600'
-              }`}>
+              )}>
               Female
             </Text>
           </Pressable>
         </View>
 
-        <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
           Weight (kg)
-        </Text>
+        </Label>
         <Input
+          className="h-14 rounded-2xl border-2 border-gray-200 px-4 text-lg"
           placeholder="e.g. 75"
           keyboardType="numeric"
           value={weight}
           onChangeText={setWeight}
         />
 
-        <Pressable
+        <Button
           onPress={handleSave}
           disabled={!canSave}
-          className={`mt-10 rounded-2xl py-4 items-center ${
-            canSave ? 'bg-indigo-500' : 'bg-gray-200'
-          }`}>
-          <Text className={`text-lg font-semibold ${canSave ? 'text-white' : 'text-gray-400'}`}>
+          className={cn('mt-10 rounded-2xl py-4', canSave ? 'bg-indigo-500' : 'bg-gray-200')}>
+          <Text className={cn('text-lg font-semibold', canSave ? 'text-white' : 'text-gray-400')}>
             Save
           </Text>
-        </Pressable>
+        </Button>
 
-        <Pressable
+        <Button
+          variant="outline"
           onPress={() => router.push('/drink-presets')}
-          className="mt-4 rounded-2xl py-4 items-center border-2 border-gray-200">
+          className="mt-4 rounded-2xl py-4 border-2 border-gray-200">
           <Text className="text-base font-semibold text-gray-600">Drink Presets</Text>
-        </Pressable>
+        </Button>
 
-        <Pressable
+        <Button
+          variant="outline"
           onPress={() => router.push('/privacy')}
-          className="mt-4 rounded-2xl py-4 items-center border-2 border-gray-200">
+          className="mt-4 rounded-2xl py-4 border-2 border-gray-200">
           <Text className="text-base font-semibold text-gray-600">Data & Privacy</Text>
-        </Pressable>
+        </Button>
       </View>
     </View>
   );
