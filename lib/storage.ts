@@ -25,7 +25,7 @@ interface StoredWater {
 }
 
 export const storage = createMMKV({
-  id: 'unlucky-bac',
+  id: 'tally-night-storage',
 });
 
 export function saveUserInfo(info: UserInfo): void {

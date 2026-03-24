@@ -36,7 +36,7 @@ function getRankEmoji(rank: number): string {
   return `#${rank}`;
 }
 
-export default function Leaderboard() {
+export default function Session() {
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
   const { convexUserId } = useApp();
   const { bottom } = useSafeAreaInsets();
@@ -81,7 +81,7 @@ export default function Leaderboard() {
   if (!data) {
     return (
       <View className="flex flex-1 bg-white items-center justify-center">
-        <Stack.Screen options={{ title: 'Leaderboard' }} />
+        <Stack.Screen options={{ title: 'Session' }} />
         <Text className="text-gray-400">Loading...</Text>
       </View>
     );
@@ -111,7 +111,7 @@ export default function Leaderboard() {
           </View>
         </View>
 
-        {/* Leaderboard */}
+        {/* Members */}
         <View className="px-6">
           {data.leaderboard.length === 0 ? (
             <Text className="text-gray-400 text-center py-8">No members yet</Text>
@@ -178,8 +178,16 @@ export default function Leaderboard() {
           )}
         </View>
 
+        {/* Disclaimer */}
+        <View className="px-6 mt-6">
+          <Text className="text-xs text-gray-400 text-center leading-4">
+            Please drink responsibly. BAC values are estimates only and should never be used to
+            determine fitness to drive or operate machinery.
+          </Text>
+        </View>
+
         {/* Leave button */}
-        <View className="px-6 mt-8">
+        <View className="px-6 mt-6">
           <Pressable
             onPress={confirmLeave}
             className="border-2 border-red-200 rounded-2xl py-3 items-center">

@@ -6,7 +6,13 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Input } from '@/components/Input';
-import { DRINK_TYPE_EMOJI, DRINK_TYPE_LABEL, DRINK_TYPES, type Drink, type DrinkType } from '@/lib/bac';
+import {
+  DRINK_TYPE_EMOJI,
+  DRINK_TYPE_LABEL,
+  DRINK_TYPES,
+  type Drink,
+  type DrinkType,
+} from '@/lib/bac';
 import { useApp } from '@/lib/context';
 import { formatTime } from '@/lib/format';
 

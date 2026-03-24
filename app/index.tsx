@@ -136,7 +136,7 @@ export default function Home() {
     <View className="flex flex-1 bg-white">
       <Stack.Screen
         options={{
-          title: 'BAC Tracker',
+          title: 'Tally Night',
           headerRight: () => (
             <View className="flex-row items-center gap-3">
               <Pressable onPress={() => router.push('/groups')} hitSlop={8}>
@@ -217,6 +217,12 @@ export default function Home() {
           </View>
         </View>
 
+        <View className="px-6 mb-4">
+          <Text className="text-xs text-gray-400 text-center leading-4">
+            BAC values are estimates only — not medical advice. Never drink and drive.
+          </Text>
+        </View>
+
         <View className="px-6">
           <View className="flex-row items-center justify-between mb-3">
             <Text className="text-lg font-semibold text-gray-800">History</Text>
@@ -243,9 +249,7 @@ export default function Home() {
                     key={`d-${originalIndex}-${i}`}
                     className="flex-row items-center justify-between py-3 border-b border-gray-100">
                     <View className="flex-row items-center gap-3 flex-1">
-                      <Text className="text-2xl">
-                        {DRINK_TYPE_EMOJI[drink.type] ?? '🍸'}
-                      </Text>
+                      <Text className="text-2xl">{DRINK_TYPE_EMOJI[drink.type] ?? '🍸'}</Text>
                       <View className="flex-1">
                         <Text className="text-base font-medium text-gray-800">
                           {DRINK_TYPE_LABEL[drink.type] ?? drink.type}

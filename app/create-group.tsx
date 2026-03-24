@@ -74,10 +74,10 @@ export default function CreateGroup() {
         </Pressable>
         <Pressable
           onPress={() =>
-            router.replace({ pathname: '/leaderboard', params: { groupId: result.groupId } })
+            router.replace({ pathname: '/session', params: { groupId: result.groupId } })
           }
           className="border-2 border-indigo-500 rounded-2xl py-3 px-8">
-          <Text className="text-indigo-500 text-base font-semibold">View Leaderboard</Text>
+          <Text className="text-indigo-500 text-base font-semibold">View Session</Text>
         </Pressable>
       </View>
     );

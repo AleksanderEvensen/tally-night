@@ -28,7 +28,7 @@ export default function JoinGroup() {
         joinCode: cleanCode,
         userId: convexUserId as Id<'users'>,
       });
-      router.replace({ pathname: '/leaderboard', params: { groupId: res.groupId } });
+      router.replace({ pathname: '/session', params: { groupId: res.groupId } });
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Could not join group. Please try again.';

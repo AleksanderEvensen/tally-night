@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { useMutation } from 'convex/react';
 import { useState } from 'react';
-import { Alert, ScrollView, Switch, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { api } from '@/convex/_generated/api';
@@ -90,8 +90,8 @@ export default function Privacy() {
         <View className="pt-8 pb-4">
           <Text className="text-2xl font-bold text-gray-900 mb-2">Data Sharing</Text>
           <Text className="text-base text-gray-500 leading-6">
-            The Groups feature lets you create or join groups with friends and see a live
-            leaderboard. To use it, you need to consent to sharing some data with our server.
+            The Groups feature lets you create or join groups with friends and see a live session
+            view. To use it, you need to consent to sharing some data with our server.
           </Text>
         </View>
 
@@ -154,8 +154,21 @@ export default function Privacy() {
         </View>
 
         {dataConsent && convexUserId && (
-          <Text className="text-xs text-gray-300 text-center">Registered with server</Text>
+          <Text className="text-xs text-gray-300 text-center mb-6">Registered with server</Text>
         )}
+
+        {/* Privacy Policy link */}
+        <View className="mt-6 pt-6 border-t border-gray-200">
+          <Pressable
+            onPress={() => Linking.openURL('https://ahse.no/tally-night/privacy-policy')}
+            className="flex-row items-center justify-between bg-gray-50 rounded-2xl p-4 border border-gray-200">
+            <View>
+              <Text className="text-base font-semibold text-gray-900">Privacy Policy</Text>
+              <Text className="text-sm text-gray-400 mt-0.5">View full privacy policy</Text>
+            </View>
+            <Text className="text-gray-400 text-lg">›</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </View>
   );

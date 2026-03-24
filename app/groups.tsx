@@ -117,7 +117,7 @@ export default function Groups() {
             <Pressable
               key={group.groupId}
               onPress={() =>
-                router.push({ pathname: '/leaderboard', params: { groupId: group.groupId } })
+                router.push({ pathname: '/session', params: { groupId: group.groupId } })
               }
               className="bg-gray-50 rounded-2xl p-4 mb-3 border border-gray-200 active:bg-gray-100">
               <View className="flex-row items-center justify-between mb-1">

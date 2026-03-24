@@ -1,16 +1,22 @@
 {
   "expo": {
-    "name": "unlucky-bac",
-    "slug": "unlucky-bac",
+    "name": "Tally Night",
+    "slug": "tally-night",
     "version": "1.0.0",
-    "scheme": "unlucky-bac",
-    "platforms": ["ios", "android"],
+    "scheme": "tally-night",
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-router", "@react-native-community/datetimepicker"],
+    "plugins": [
+      "expo-router",
+      "@react-native-community/datetimepicker"
+    ],
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true
@@ -23,25 +29,27 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.aleksanderhse.unluckybac"
+      "bundleIdentifier": "no.ahse.tallynight"
     },
     "android": {
-      "package": "com.aleksanderhse.unluckybac",
+      "package": "no.ahse.tallynight",
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
     },
+    "owner": "aleksander-hse",
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "d3b1fa7d-5f97-4ece-ab28-5c8a82735d49"
+        "projectId": "872d1cef-6477-4abf-a6f3-9d7427efbb70"
       }
-    },
-    "owner": "aleksander-hse"
+    }
   }
 }
