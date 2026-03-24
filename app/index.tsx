@@ -1,9 +1,24 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, Stack, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Text } from '@/components/ui/text';
 import {
   DRINK_TYPE_EMOJI,
   DRINK_TYPE_LABEL,
@@ -14,6 +29,7 @@ import {
 } from '@/lib/bac';
 import { useApp } from '@/lib/context';
 import { formatTime } from '@/lib/format';
+import { cn } from '@/lib/utils';
 
 type HistoryEntry =
   | { kind: 'drink'; drink: Drink; originalIndex: number }
@@ -43,6 +59,12 @@ function getBacStatus(bac: number): string {
   return 'Elevated';
 }
 
+type DeleteDialogState =
+  | { kind: 'none' }
+  | { kind: 'drink'; index: number; drinkType: string }
+  | { kind: 'water'; index: number }
+  | { kind: 'clear' };
+
 export default function Home() {
   const {
     userInfo,
@@ -59,6 +81,7 @@ export default function Home() {
   const { bottom } = useSafeAreaInsets();
   const router = useRouter();
   const [now, setNow] = useState(() => new Date());
+  const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({ kind: 'none' });
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30_000);
@@ -74,6 +97,19 @@ export default function Home() {
       clearDrinks();
     }
   }, [drinks, clearDrinks]);
+
+  const closeDialog = useCallback(() => setDeleteDialog({ kind: 'none' }), []);
+
+  const handleDeleteConfirm = useCallback(() => {
+    if (deleteDialog.kind === 'drink') {
+      deleteDrink(deleteDialog.index);
+    } else if (deleteDialog.kind === 'water') {
+      deleteWater(deleteDialog.index);
+    } else if (deleteDialog.kind === 'clear') {
+      clearDrinks();
+    }
+    closeDialog();
+  }, [deleteDialog, deleteDrink, deleteWater, clearDrinks, closeDialog]);
 
   if (isLoading) {
     return (
@@ -103,34 +139,25 @@ export default function Home() {
     })
     .slice(0, 30);
 
-  function confirmDeleteDrink(index: number, drinkType: string) {
-    Alert.alert('Delete Drink', `Are you sure you want to delete this ${drinkType}?`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => deleteDrink(index) },
-    ]);
-  }
-
-  function confirmDeleteWater(index: number) {
-    Alert.alert('Delete Water', 'Are you sure you want to delete this water entry?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => deleteWater(index) },
-    ]);
-  }
-
-  function confirmClearHistory() {
-    Alert.alert(
-      'Clear History',
-      'This will delete all your drinks and water entries. This cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Clear All', style: 'destructive', onPress: () => clearDrinks() },
-      ]
-    );
-  }
-
   function logWater(ml: number) {
     addWater({ time: new Date(), volumeMl: ml });
   }
+
+  const dialogTitle =
+    deleteDialog.kind === 'drink'
+      ? 'Delete Drink'
+      : deleteDialog.kind === 'water'
+        ? 'Delete Water'
+        : 'Clear History';
+
+  const dialogDescription =
+    deleteDialog.kind === 'drink'
+      ? `Are you sure you want to delete this ${deleteDialog.drinkType}?`
+      : deleteDialog.kind === 'water'
+        ? 'Are you sure you want to delete this water entry?'
+        : 'This will delete all your drinks and water entries. This cannot be undone.';
+
+  const dialogActionLabel = deleteDialog.kind === 'clear' ? 'Clear All' : 'Delete';
 
   return (
     <View className="flex flex-1 bg-white">
@@ -158,13 +185,14 @@ export default function Home() {
             </Text>
             <Text className="text-center text-sm text-gray-400 mt-1">‰ (tap for graph)</Text>
           </Pressable>
-          <View
-            style={{ backgroundColor: bacColor + '20' }}
-            className="mt-3 px-4 py-1.5 rounded-full">
+          <Badge
+            variant="outline"
+            style={{ backgroundColor: bacColor + '20', borderColor: bacColor + '40' }}
+            className="mt-3 px-4 py-1.5">
             <Text style={{ color: bacColor }} className="text-base font-semibold">
               {bacStatus}
             </Text>
-          </View>
+          </Badge>
         </View>
 
         <View className="px-6 mb-4">
@@ -173,30 +201,33 @@ export default function Home() {
           </Text>
           <View className="flex-row gap-2">
             {STOMACH_OPTIONS.map((opt) => (
-              <Pressable
+              <Button
                 key={opt.value}
+                variant="outline"
                 onPress={() => setStomachStatus(opt.value)}
-                className={`flex-1 py-2 rounded-xl items-center border ${
-                  stomachStatus === opt.value ? 'border-indigo-400 bg-indigo-50' : 'border-gray-200'
-                }`}>
+                className={cn(
+                  'flex-1 h-auto flex-col py-2 rounded-xl',
+                  stomachStatus === opt.value && 'border-indigo-400 bg-indigo-50'
+                )}>
                 <Text className="text-base">{opt.icon}</Text>
                 <Text
-                  className={`text-xs font-medium ${
+                  className={cn(
+                    'text-xs font-medium',
                     stomachStatus === opt.value ? 'text-indigo-600' : 'text-gray-500'
-                  }`}>
+                  )}>
                   {opt.label}
                 </Text>
-              </Pressable>
+              </Button>
             ))}
           </View>
         </View>
 
         <View className="px-6 mb-4">
-          <Pressable
+          <Button
             onPress={() => router.push('/add-drink')}
-            className="bg-indigo-500 rounded-2xl py-4 items-center shadow-sm">
+            className="bg-indigo-500 rounded-2xl py-4 h-auto">
             <Text className="text-white text-lg font-semibold">+ Add Drink</Text>
-          </Pressable>
+          </Button>
         </View>
 
         {/* Water quick-log */}
@@ -206,34 +237,40 @@ export default function Home() {
           </Text>
           <View className="flex-row gap-2">
             {WATER_PRESETS.map((ml) => (
-              <Pressable
+              <Button
                 key={ml}
+                variant="outline"
                 onPress={() => logWater(ml)}
-                className="flex-1 py-3 rounded-xl items-center border border-blue-200 bg-blue-50 active:bg-blue-100">
+                className="flex-1 h-auto flex-col py-3 rounded-xl border-blue-200 bg-blue-50 active:bg-blue-100">
                 <Text className="text-base">💧</Text>
                 <Text className="text-xs font-medium text-blue-600">{ml}ml</Text>
-              </Pressable>
+              </Button>
             ))}
           </View>
         </View>
 
         <View className="px-6 mb-4">
-          <Text className="text-xs text-gray-400 text-center leading-4">
+          <Text variant="muted" className="text-xs text-center leading-4">
             BAC values are estimates only — not medical advice. Never drink and drive.
           </Text>
         </View>
 
+        <Separator className="mx-6 mb-4" />
+
         <View className="px-6">
           <View className="flex-row items-center justify-between mb-3">
-            <Text className="text-lg font-semibold text-gray-800">History</Text>
+            <Text variant="large" className="text-gray-800">
+              History
+            </Text>
             {history.length > 0 && (
-              <Pressable
-                onPress={confirmClearHistory}
-                hitSlop={8}
+              <Button
+                variant="ghost"
+                size="sm"
+                onPress={() => setDeleteDialog({ kind: 'clear' })}
                 className="flex-row items-center gap-1">
                 <Ionicons name="trash-outline" size={16} color="#9ca3af" />
                 <Text className="text-sm text-gray-400">Clear</Text>
-              </Pressable>
+              </Button>
             )}
           </View>
           {history.length === 0 ? (
@@ -245,68 +282,99 @@ export default function Home() {
               if (entry.kind === 'drink') {
                 const { drink, originalIndex } = entry;
                 return (
-                  <View
+                  <Card
                     key={`d-${originalIndex}-${i}`}
-                    className="flex-row items-center justify-between py-3 border-b border-gray-100">
-                    <View className="flex-row items-center gap-3 flex-1">
-                      <Text className="text-2xl">{DRINK_TYPE_EMOJI[drink.type] ?? '🍸'}</Text>
-                      <View className="flex-1">
-                        <Text className="text-base font-medium text-gray-800">
-                          {DRINK_TYPE_LABEL[drink.type] ?? drink.type}
-                        </Text>
-                        <Text className="text-sm text-gray-400">
-                          {drink.volumeMl}ml · {drink.alcoholPercent}% · {formatTime(drink.time)}
-                        </Text>
+                    className="mb-2 py-3 shadow-none border-gray-100">
+                    <CardContent className="flex-row items-center justify-between p-0 px-4">
+                      <View className="flex-row items-center gap-3 flex-1">
+                        <Text className="text-2xl">{DRINK_TYPE_EMOJI[drink.type] ?? '🍸'}</Text>
+                        <View className="flex-1">
+                          <Text className="text-base font-medium text-gray-800">
+                            {DRINK_TYPE_LABEL[drink.type] ?? drink.type}
+                          </Text>
+                          <Text variant="muted">
+                            {drink.volumeMl}ml · {drink.alcoholPercent}% · {formatTime(drink.time)}
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                    <View className="flex-row items-center gap-1">
-                      <Pressable
-                        onPress={() =>
-                          router.push({
-                            pathname: '/edit-drink',
-                            params: { index: originalIndex },
-                          })
-                        }
-                        hitSlop={6}
-                        className="p-2">
-                        <Ionicons name="pencil-outline" size={18} color="#6366f1" />
-                      </Pressable>
-                      <Pressable
-                        onPress={() => confirmDeleteDrink(originalIndex, drink.type)}
-                        hitSlop={6}
-                        className="p-2">
-                        <Ionicons name="trash-outline" size={18} color="#ef4444" />
-                      </Pressable>
-                    </View>
-                  </View>
+                      <View className="flex-row items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onPress={() =>
+                            router.push({
+                              pathname: '/edit-drink',
+                              params: { index: originalIndex },
+                            })
+                          }>
+                          <Ionicons name="pencil-outline" size={18} color="#6366f1" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onPress={() =>
+                            setDeleteDialog({
+                              kind: 'drink',
+                              index: originalIndex,
+                              drinkType: drink.type,
+                            })
+                          }>
+                          <Ionicons name="trash-outline" size={18} color="#ef4444" />
+                        </Button>
+                      </View>
+                    </CardContent>
+                  </Card>
                 );
               }
               const { water, originalIndex } = entry;
               return (
-                <View
+                <Card
                   key={`w-${originalIndex}-${i}`}
-                  className="flex-row items-center justify-between py-3 border-b border-gray-100">
-                  <View className="flex-row items-center gap-3 flex-1">
-                    <Text className="text-2xl">💧</Text>
-                    <View className="flex-1">
-                      <Text className="text-base font-medium text-blue-600">Water</Text>
-                      <Text className="text-sm text-gray-400">
-                        {water.volumeMl}ml · {formatTime(water.time)}
-                      </Text>
+                  className="mb-2 py-3 shadow-none border-gray-100">
+                  <CardContent className="flex-row items-center justify-between p-0 px-4">
+                    <View className="flex-row items-center gap-3 flex-1">
+                      <Text className="text-2xl">💧</Text>
+                      <View className="flex-1">
+                        <Text className="text-base font-medium text-blue-600">Water</Text>
+                        <Text variant="muted">
+                          {water.volumeMl}ml · {formatTime(water.time)}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                  <Pressable
-                    onPress={() => confirmDeleteWater(originalIndex)}
-                    hitSlop={6}
-                    className="p-2">
-                    <Ionicons name="trash-outline" size={18} color="#ef4444" />
-                  </Pressable>
-                </View>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onPress={() => setDeleteDialog({ kind: 'water', index: originalIndex })}>
+                      <Ionicons name="trash-outline" size={18} color="#ef4444" />
+                    </Button>
+                  </CardContent>
+                </Card>
               );
             })
           )}
         </View>
       </ScrollView>
+
+      <AlertDialog
+        open={deleteDialog.kind !== 'none'}
+        onOpenChange={(open) => !open && closeDialog()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{dialogDescription}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onPress={closeDialog}>
+              <Text>Cancel</Text>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive active:bg-destructive/90"
+              onPress={handleDeleteConfirm}>
+              <Text className="text-white">{dialogActionLabel}</Text>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </View>
   );
 }
