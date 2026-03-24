@@ -1,14 +1,29 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, useMutation } from 'convex/react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
 import { useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Text } from '@/components/ui/text';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { useApp } from '@/lib/context';
+import { formatExpiry } from '@/lib/format';
 
 function getBacColor(bac: number): string {
   if (bac === 0) return '#22c55e';
@@ -18,21 +33,10 @@ function getBacColor(bac: number): string {
   return '#ef4444';
 }
 
-function formatExpiry(expires: number): string {
-  const now = Date.now();
-  const diff = expires - now;
-  if (diff <= 0) return 'Expired';
-  const hours = Math.floor(diff / 3_600_000);
-  const minutes = Math.floor((diff % 3_600_000) / 60_000);
-  if (hours > 24) return `${Math.floor(hours / 24)}d ${hours % 24}h left`;
-  if (hours > 0) return `${hours}h ${minutes}m left`;
-  return `${minutes}m left`;
-}
-
 function getRankEmoji(rank: number): string {
-  if (rank === 1) return '🥇';
-  if (rank === 2) return '🥈';
-  if (rank === 3) return '🥉';
+  if (rank === 1) return '\u{1F947}';
+  if (rank === 2) return '\u{1F948}';
+  if (rank === 3) return '\u{1F949}';
   return `#${rank}`;
 }
 
@@ -42,6 +46,7 @@ export default function Session() {
   const { bottom } = useSafeAreaInsets();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
+  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
 
   const data = useQuery(
     api.groups.getLeaderboard,
@@ -57,25 +62,17 @@ export default function Session() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  function confirmLeave() {
-    Alert.alert('Leave Group', 'Are you sure you want to leave this group?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Leave',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await leaveGroup({
-              groupId: groupId as Id<'groups'>,
-              userId: convexUserId as Id<'users'>,
-            });
-            router.back();
-          } catch {
-            Alert.alert('Error', 'Could not leave group.');
-          }
-        },
-      },
-    ]);
+  async function handleLeave() {
+    try {
+      await leaveGroup({
+        groupId: groupId as Id<'groups'>,
+        userId: convexUserId as Id<'users'>,
+      });
+      router.back();
+    } catch {
+      // Mutation failure is visible via Convex's reactive queries
+    }
+    setLeaveDialogOpen(false);
   }
 
   if (!data) {
@@ -93,7 +90,7 @@ export default function Session() {
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: bottom + 16 }}>
         {/* Group info header */}
         <View className="px-6 pt-6 pb-4 items-center">
-          <Text className="text-2xl font-bold text-gray-900">{data.groupName}</Text>
+          <Text variant="h3">{data.groupName}</Text>
           <View className="flex-row items-center gap-2 mt-2">
             <Pressable
               onPress={handleCopyCode}
@@ -120,10 +117,10 @@ export default function Session() {
               const rank = index + 1;
               const isMe = member.userId === convexUserId;
               return (
-                <View
+                <Card
                   key={member.userId}
-                  className={`flex-row items-center py-4 border-b border-gray-100 ${
-                    isMe ? 'bg-indigo-50 -mx-3 px-3 rounded-xl border-0' : ''
+                  className={`flex-row items-center py-4 px-4 mb-2 ${
+                    isMe ? 'bg-indigo-50 border-indigo-200' : ''
                   }`}>
                   {/* Rank */}
                   <View className="w-10 items-center">
@@ -141,23 +138,39 @@ export default function Session() {
                     </Text>
                     <View className="flex-row items-center gap-2 mt-0.5">
                       {member.drinks.beer > 0 && (
-                        <Text className="text-xs text-gray-400">🍺{member.drinks.beer}</Text>
+                        <Text className="text-xs text-gray-400">
+                          {'\u{1F37A}'}
+                          {member.drinks.beer}
+                        </Text>
                       )}
                       {member.drinks.wine > 0 && (
-                        <Text className="text-xs text-gray-400">🍷{member.drinks.wine}</Text>
+                        <Text className="text-xs text-gray-400">
+                          {'\u{1F377}'}
+                          {member.drinks.wine}
+                        </Text>
                       )}
                       {member.drinks.spirits > 0 && (
-                        <Text className="text-xs text-gray-400">🥃{member.drinks.spirits}</Text>
+                        <Text className="text-xs text-gray-400">
+                          {'\u{1F943}'}
+                          {member.drinks.spirits}
+                        </Text>
                       )}
                       {member.drinks.cocktails > 0 && (
-                        <Text className="text-xs text-gray-400">🍸{member.drinks.cocktails}</Text>
+                        <Text className="text-xs text-gray-400">
+                          {'\u{1F378}'}
+                          {member.drinks.cocktails}
+                        </Text>
                       )}
                       {member.drinks.shots > 0 && (
-                        <Text className="text-xs text-gray-400">🥃{member.drinks.shots}</Text>
+                        <Text className="text-xs text-gray-400">
+                          {'\u{1F943}'}
+                          {member.drinks.shots}
+                        </Text>
                       )}
                       {member.drinks.ciders_seltzers > 0 && (
                         <Text className="text-xs text-gray-400">
-                          🍏{member.drinks.ciders_seltzers}
+                          {'\u{1F34F}'}
+                          {member.drinks.ciders_seltzers}
                         </Text>
                       )}
                     </View>
@@ -170,16 +183,18 @@ export default function Session() {
                       className="text-2xl font-bold">
                       {member.bloodAlcoholLevel.toFixed(2)}
                     </Text>
-                    <Text className="text-xs text-gray-400">‰</Text>
+                    <Text className="text-xs text-gray-400">{'\u2030'}</Text>
                   </View>
-                </View>
+                </Card>
               );
             })
           )}
         </View>
 
+        <Separator className="mx-6 mt-4" />
+
         {/* Disclaimer */}
-        <View className="px-6 mt-6">
+        <View className="px-6 mt-4">
           <Text className="text-xs text-gray-400 text-center leading-4">
             Please drink responsibly. BAC values are estimates only and should never be used to
             determine fitness to drive or operate machinery.
@@ -188,13 +203,38 @@ export default function Session() {
 
         {/* Leave button */}
         <View className="px-6 mt-6">
-          <Pressable
-            onPress={confirmLeave}
-            className="border-2 border-red-200 rounded-2xl py-3 items-center">
+          <Button
+            variant="outline"
+            onPress={() => setLeaveDialogOpen(true)}
+            className="border-2 border-red-200 rounded-2xl py-3">
             <Text className="text-red-500 text-base font-semibold">Leave Group</Text>
-          </Pressable>
+          </Button>
         </View>
       </ScrollView>
+
+      {/* Leave Group AlertDialog */}
+      <AlertDialog
+        open={leaveDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) setLeaveDialogOpen(false);
+        }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave Group</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to leave this group?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onPress={() => setLeaveDialogOpen(false)}>
+              <Text>Cancel</Text>
+            </AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive" onPress={handleLeave}>
+              <Text className="text-white">Leave</Text>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </View>
   );
 }
