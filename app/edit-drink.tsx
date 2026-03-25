@@ -28,9 +28,9 @@ export default function EditDrink() {
 
   if (!drink) {
     return (
-      <View className="flex flex-1 bg-white items-center justify-center">
+      <View className="flex flex-1 bg-background items-center justify-center">
         <Stack.Screen options={{ title: 'Edit Drink' }} />
-        <Text className="text-gray-400">Drink not found.</Text>
+        <Text className="text-muted-foreground">Drink not found.</Text>
       </View>
     );
   }
@@ -54,17 +54,17 @@ export default function EditDrink() {
   }
 
   return (
-    <View className="flex flex-1 bg-white">
+    <View className="flex flex-1 bg-background">
       <Stack.Screen options={{ title: 'Edit Drink' }} />
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 24, paddingBottom: bottom + 24 }}
         keyboardShouldPersistTaps="handled">
         {/* Time selector */}
-        <View className="flex-row items-center justify-between mb-6 bg-gray-50 rounded-xl p-3">
-          <Text className="text-sm text-gray-500">Time</Text>
+        <View className="flex-row items-center justify-between mb-6 bg-muted rounded-xl p-3">
+          <Text className="text-sm text-muted-foreground">Time</Text>
           <Button variant="outline" onPress={() => setShowTimePicker(true)} className="px-4 py-2">
-            <Text className="text-base font-medium text-indigo-600">{formatTime(drinkTime)}</Text>
+            <Text className="text-base font-medium text-indigo-400">{formatTime(drinkTime)}</Text>
           </Button>
         </View>
 
@@ -87,7 +87,7 @@ export default function EditDrink() {
           </View>
         )}
 
-        <Label className="text-sm text-gray-500 mb-2">Type</Label>
+        <Label className="text-sm text-muted-foreground mb-2">Type</Label>
         <View className="flex-row flex-wrap gap-2 mb-4">
           {DRINK_TYPES.map((t) => (
             <Button
@@ -99,25 +99,27 @@ export default function EditDrink() {
               }`}>
               <Text className="text-base">{DRINK_TYPE_EMOJI[t]}</Text>
               <Text
-                className={`text-sm font-medium ${type === t ? 'text-white' : 'text-gray-600'}`}>
+                className={`text-sm font-medium ${
+                  type === t ? 'text-white' : 'text-muted-foreground'
+                }`}>
                 {DRINK_TYPE_LABEL[t]}
               </Text>
             </Button>
           ))}
         </View>
 
-        <Label className="text-sm text-gray-500 mb-1">Volume (ml)</Label>
+        <Label className="text-sm text-muted-foreground mb-1">Volume (ml)</Label>
         <Input
-          className="mb-3 h-9"
+          className="mb-3 h-auto text-lg ios:leading-0"
           placeholder="e.g. 330"
           keyboardType="numeric"
           value={volume}
           onChangeText={setVolume}
         />
 
-        <Label className="text-sm text-gray-500 mb-1">Alcohol %</Label>
+        <Label className="text-sm text-muted-foreground mb-1">Alcohol %</Label>
         <Input
-          className="mb-4 h-9"
+          className="mb-4 h-auto text-lg ios:leading-0"
           placeholder="e.g. 5"
           keyboardType="numeric"
           value={percent}
@@ -127,8 +129,11 @@ export default function EditDrink() {
         <Button
           onPress={handleSave}
           disabled={!canSave}
-          className={`rounded-xl py-4 ${canSave ? 'bg-indigo-500' : 'bg-gray-200'}`}>
-          <Text className={`text-base font-semibold ${canSave ? 'text-white' : 'text-gray-400'}`}>
+          className={`rounded-xl py-4 h-auto ${canSave ? 'bg-indigo-500' : 'bg-muted'}`}>
+          <Text
+            className={`text-base font-semibold ${
+              canSave ? 'text-white' : 'text-muted-foreground'
+            }`}>
             Save Changes
           </Text>
         </Button>

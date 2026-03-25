@@ -57,7 +57,7 @@ export default function EditPreset() {
 
   if (isEditing && !existing) {
     return (
-      <View className="flex flex-1 bg-white items-center justify-center">
+      <View className="flex flex-1 bg-background items-center justify-center">
         <Stack.Screen options={{ title: 'Edit Preset' }} />
         <Text className="text-muted-foreground">Preset not found.</Text>
       </View>
@@ -65,7 +65,7 @@ export default function EditPreset() {
   }
 
   return (
-    <View className="flex flex-1 bg-white">
+    <View className="flex flex-1 bg-background">
       <Stack.Screen options={{ title: isEditing ? 'Edit Preset' : 'New Preset' }} />
       <ScrollView
         className="flex-1"
@@ -78,7 +78,7 @@ export default function EditPreset() {
               key={e}
               onPress={() => setEmoji(e)}
               className={`w-12 h-12 items-center justify-center rounded-xl border-2 ${
-                emoji === e ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'
+                emoji === e ? 'border-indigo-500 bg-indigo-500/10' : 'border-border'
               }`}>
               <Text className="text-2xl">{e}</Text>
             </Pressable>
@@ -86,7 +86,12 @@ export default function EditPreset() {
         </View>
 
         <Label className="mb-1">Name</Label>
-        <Input className="mb-3" placeholder="e.g. IPA Pint" value={name} onChangeText={setName} />
+        <Input
+          className="mb-3 h-auto text-lg ios:leading-0"
+          placeholder="e.g. IPA Pint"
+          value={name}
+          onChangeText={setName}
+        />
 
         <Label className="mb-2">Type</Label>
         <View className="flex-row flex-wrap gap-2 mb-4">
@@ -95,11 +100,11 @@ export default function EditPreset() {
               key={t}
               onPress={() => setType(t)}
               className={`px-4 py-2 rounded-xl border-2 ${
-                type === t ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'
+                type === t ? 'border-indigo-500 bg-indigo-500/10' : 'border-border'
               }`}>
               <Text
                 className={`text-sm font-medium ${
-                  type === t ? 'text-indigo-600' : 'text-muted-foreground'
+                  type === t ? 'text-indigo-400' : 'text-muted-foreground'
                 }`}>
                 {DRINK_TYPE_LABEL[t]}
               </Text>
@@ -109,7 +114,7 @@ export default function EditPreset() {
 
         <Label className="mb-1">Volume (ml)</Label>
         <Input
-          className="mb-3"
+          className="mb-3 h-auto text-lg ios:leading-0"
           placeholder="e.g. 330"
           keyboardType="numeric"
           value={volume}
@@ -118,7 +123,7 @@ export default function EditPreset() {
 
         <Label className="mb-1">Alcohol %</Label>
         <Input
-          className="mb-6"
+          className="mb-6 h-auto text-lg ios:leading-0"
           placeholder="e.g. 5"
           keyboardType="numeric"
           value={percent}

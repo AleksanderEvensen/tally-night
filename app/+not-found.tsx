@@ -21,7 +21,7 @@ export default function NotFoundScreen() {
 }
 
 const styles = {
-  container: 'flex flex-1 bg-white',
+  container: 'flex flex-1 bg-background',
   content: 'flex-1 items-center justify-center px-6',
   link: 'mt-4 pt-4',
 };

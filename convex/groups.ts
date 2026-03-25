@@ -224,7 +224,7 @@ export const getLeaderboard = query({
 
     const group = await ctx.db.get(groupId);
     if (group === null) {
-      throw new Error('Group not found');
+      return null;
     }
 
     // Get all user group infos sorted by BAC descending

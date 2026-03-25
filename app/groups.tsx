@@ -50,17 +50,17 @@ export default function Groups() {
 
   if (!dataConsent) {
     return (
-      <View className="flex flex-1 bg-white px-6 items-center justify-center">
+      <View className="flex flex-1 bg-background px-6 items-center justify-center">
         <Stack.Screen options={{ title: 'Groups' }} />
-        <Ionicons name="lock-closed-outline" size={48} color="#d1d5db" />
-        <Text className="text-lg font-semibold text-gray-800 mt-4 text-center">
-          Groups require data sharing
-        </Text>
-        <Text className="text-sm text-gray-400 mt-2 text-center leading-5">
+        <Ionicons name="lock-closed-outline" size={48} color="#9ca3af" />
+        <Text className="text-lg font-semibold mt-4 text-center">Groups require data sharing</Text>
+        <Text className="text-sm text-muted-foreground mt-2 text-center leading-5">
           To use Groups, you need to consent to sharing your BAC and drink data. Your personal info
           (weight, gender, timestamps) is never shared.
         </Text>
-        <Button onPress={() => router.push('/privacy')} className="mt-6 rounded-2xl py-3 px-8">
+        <Button
+          onPress={() => router.push('/privacy')}
+          className="mt-6 rounded-2xl py-4 h-auto px-8">
           <Text>Go to Data & Privacy</Text>
         </Button>
       </View>
@@ -88,25 +88,27 @@ export default function Groups() {
   }
 
   return (
-    <View className="flex flex-1 bg-white">
+    <View className="flex flex-1 bg-background">
       <Stack.Screen options={{ title: 'Groups' }} />
       <ScrollView className="flex-1 px-6" contentContainerStyle={{ paddingBottom: bottom + 16 }}>
         <View className="flex-row gap-3 pt-6 mb-6">
-          <Button onPress={() => router.push('/create-group')} className="flex-1 rounded-2xl py-4">
+          <Button
+            onPress={() => router.push('/create-group')}
+            className="flex-1 rounded-2xl py-4 h-auto">
             <Text>Create Group</Text>
           </Button>
           <Button
             variant="outline"
             onPress={() => router.push('/join-group')}
-            className="flex-1 border-2 border-indigo-500 rounded-2xl py-4">
-            <Text className="text-indigo-500 text-base font-semibold">Join Group</Text>
+            className="flex-1 border-2 border-indigo-500 rounded-2xl py-4 h-auto">
+            <Text className="text-indigo-400 text-base font-semibold">Join Group</Text>
           </Button>
         </View>
 
         {groups === undefined ? (
-          <Text className="text-gray-400 text-center py-8">Loading...</Text>
+          <Text className="text-muted-foreground text-center py-8">Loading...</Text>
         ) : groups.length === 0 ? (
-          <Text className="text-gray-400 text-center py-8">
+          <Text className="text-muted-foreground text-center py-8">
             No groups yet.{'\n'}Create one or join with a code!
           </Text>
         ) : (
@@ -118,7 +120,7 @@ export default function Groups() {
               }>
               <Card className="mb-3 p-4 py-4 gap-1">
                 <View className="flex-row items-center justify-between mb-1">
-                  <Text className="text-lg font-semibold text-gray-900 flex-1">{group.name}</Text>
+                  <Text className="text-lg font-semibold flex-1">{group.name}</Text>
                   <View className="flex-row gap-1">
                     {group.memberType === 'admin' && (
                       <Pressable
@@ -149,14 +151,16 @@ export default function Groups() {
                   </View>
                 </View>
                 <View className="flex-row items-center gap-3">
-                  <Text className="text-sm text-gray-400">Code: {group.joinCode}</Text>
-                  <Text className="text-sm text-gray-400">{formatExpiry(group.expires)}</Text>
+                  <Text className="text-sm text-muted-foreground">Code: {group.joinCode}</Text>
+                  <Text className="text-sm text-muted-foreground">
+                    {formatExpiry(group.expires)}
+                  </Text>
                 </View>
                 {group.memberType === 'admin' && (
                   <Badge
                     variant="secondary"
-                    className="self-start mt-2 bg-indigo-100 border-indigo-100">
-                    <Text className="text-xs font-medium text-indigo-600">Admin</Text>
+                    className="self-start mt-2 bg-indigo-500/15 border-indigo-500/15">
+                    <Text className="text-xs font-medium text-indigo-400">Admin</Text>
                   </Badge>
                 )}
               </Card>

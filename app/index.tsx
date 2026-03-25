@@ -111,9 +111,31 @@ export default function Home() {
     closeDialog();
   }, [deleteDialog, deleteDrink, deleteWater, clearDrinks, closeDialog]);
 
+  const headerRight = useCallback(
+    () => (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 12,
+          paddingLeft: 8,
+          paddingRight: 8,
+        }}>
+        <Pressable onPress={() => router.push('/groups')} hitSlop={8}>
+          <Ionicons name="people-outline" size={26} color="#6366f1" />
+        </Pressable>
+        <Pressable onPress={() => router.push('/profile')} hitSlop={8}>
+          <Ionicons name="person-circle-outline" size={28} color="#6366f1" />
+        </Pressable>
+      </View>
+    ),
+    [router]
+  );
+
   if (isLoading) {
     return (
-      <View className="flex flex-1 items-center justify-center bg-white">
+      <View className="flex flex-1 items-center justify-center bg-background">
+        <Stack.Screen options={{ title: 'Tally Night', headerRight }} />
         <ActivityIndicator size="large" color="#6366f1" />
       </View>
     );
@@ -160,30 +182,18 @@ export default function Home() {
   const dialogActionLabel = deleteDialog.kind === 'clear' ? 'Clear All' : 'Delete';
 
   return (
-    <View className="flex flex-1 bg-white">
-      <Stack.Screen
-        options={{
-          title: 'Tally Night',
-          headerRight: () => (
-            <View className="flex-row items-center gap-3">
-              <Pressable onPress={() => router.push('/groups')} hitSlop={8}>
-                <Ionicons name="people-outline" size={26} color="#6366f1" />
-              </Pressable>
-              <Pressable onPress={() => router.push('/profile')} hitSlop={8}>
-                <Ionicons name="person-circle-outline" size={28} color="#6366f1" />
-              </Pressable>
-            </View>
-          ),
-        }}
-      />
+    <View className="flex flex-1 bg-background">
+      <Stack.Screen options={{ title: 'Tally Night', headerRight }} />
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: bottom + 16 }}>
         <View className="items-center pt-8 pb-6">
-          <Text className="text-base text-gray-500 mb-2">Blood Alcohol Level</Text>
+          <Text className="text-base text-muted-foreground mb-2">Blood Alcohol Level</Text>
           <Pressable onPress={() => router.push('/bac-graph')}>
             <Text style={{ color: bacColor }} className="text-7xl font-bold">
               {bac.toFixed(2)}
             </Text>
-            <Text className="text-center text-sm text-gray-400 mt-1">‰ (tap for graph)</Text>
+            <Text className="text-center text-sm text-muted-foreground mt-1">
+              ‰ (tap for graph)
+            </Text>
           </Pressable>
           <Badge
             variant="outline"
@@ -196,7 +206,7 @@ export default function Home() {
         </View>
 
         <View className="px-6 mb-4">
-          <Text className="text-xs text-gray-400 mb-2 text-center uppercase tracking-wide">
+          <Text className="text-xs text-muted-foreground mb-2 text-center uppercase tracking-wide">
             Stomach
           </Text>
           <View className="flex-row gap-2">
@@ -207,13 +217,13 @@ export default function Home() {
                 onPress={() => setStomachStatus(opt.value)}
                 className={cn(
                   'flex-1 h-auto flex-col py-2 rounded-xl',
-                  stomachStatus === opt.value && 'border-indigo-400 bg-indigo-50'
+                  stomachStatus === opt.value && 'border-indigo-400 bg-indigo-500/10'
                 )}>
                 <Text className="text-base">{opt.icon}</Text>
                 <Text
                   className={cn(
                     'text-xs font-medium',
-                    stomachStatus === opt.value ? 'text-indigo-600' : 'text-gray-500'
+                    stomachStatus === opt.value ? 'text-indigo-400' : 'text-muted-foreground'
                   )}>
                   {opt.label}
                 </Text>
@@ -232,7 +242,7 @@ export default function Home() {
 
         {/* Water quick-log */}
         <View className="px-6 mb-6">
-          <Text className="text-xs text-gray-400 mb-2 text-center uppercase tracking-wide">
+          <Text className="text-xs text-muted-foreground mb-2 text-center uppercase tracking-wide">
             Log Water
           </Text>
           <View className="flex-row gap-2">
@@ -241,9 +251,9 @@ export default function Home() {
                 key={ml}
                 variant="outline"
                 onPress={() => logWater(ml)}
-                className="flex-1 h-auto flex-col py-3 rounded-xl border-blue-200 bg-blue-50 active:bg-blue-100">
+                className="flex-1 h-auto flex-col py-3 rounded-xl border-blue-400/30 bg-blue-500/10 active:bg-blue-500/20">
                 <Text className="text-base">💧</Text>
-                <Text className="text-xs font-medium text-blue-600">{ml}ml</Text>
+                <Text className="text-xs font-medium text-blue-400">{ml}ml</Text>
               </Button>
             ))}
           </View>
@@ -259,9 +269,7 @@ export default function Home() {
 
         <View className="px-6">
           <View className="flex-row items-center justify-between mb-3">
-            <Text variant="large" className="text-gray-800">
-              History
-            </Text>
+            <Text variant="large">History</Text>
             {history.length > 0 && (
               <Button
                 variant="ghost"
@@ -269,12 +277,12 @@ export default function Home() {
                 onPress={() => setDeleteDialog({ kind: 'clear' })}
                 className="flex-row items-center gap-1">
                 <Ionicons name="trash-outline" size={16} color="#9ca3af" />
-                <Text className="text-sm text-gray-400">Clear</Text>
+                <Text className="text-sm text-muted-foreground">Clear</Text>
               </Button>
             )}
           </View>
           {history.length === 0 ? (
-            <Text className="text-gray-400 text-center py-8">
+            <Text className="text-muted-foreground text-center py-8">
               No entries yet.{'\n'}Tap {'"'}Add Drink{'"'} to get started.
             </Text>
           ) : (
@@ -282,14 +290,12 @@ export default function Home() {
               if (entry.kind === 'drink') {
                 const { drink, originalIndex } = entry;
                 return (
-                  <Card
-                    key={`d-${originalIndex}-${i}`}
-                    className="mb-2 py-3 shadow-none border-gray-100">
+                  <Card key={`d-${originalIndex}-${i}`} className="mb-2 py-3 shadow-none">
                     <CardContent className="flex-row items-center justify-between p-0 px-4">
                       <View className="flex-row items-center gap-3 flex-1">
                         <Text className="text-2xl">{DRINK_TYPE_EMOJI[drink.type] ?? '🍸'}</Text>
                         <View className="flex-1">
-                          <Text className="text-base font-medium text-gray-800">
+                          <Text className="text-base font-medium">
                             {DRINK_TYPE_LABEL[drink.type] ?? drink.type}
                           </Text>
                           <Text variant="muted">
@@ -328,14 +334,12 @@ export default function Home() {
               }
               const { water, originalIndex } = entry;
               return (
-                <Card
-                  key={`w-${originalIndex}-${i}`}
-                  className="mb-2 py-3 shadow-none border-gray-100">
+                <Card key={`w-${originalIndex}-${i}`} className="mb-2 py-3 shadow-none">
                   <CardContent className="flex-row items-center justify-between p-0 px-4">
                     <View className="flex-row items-center gap-3 flex-1">
                       <Text className="text-2xl">💧</Text>
                       <View className="flex-1">
-                        <Text className="text-base font-medium text-blue-600">Water</Text>
+                        <Text className="text-base font-medium text-blue-400">Water</Text>
                         <Text variant="muted">
                           {water.volumeMl}ml · {formatTime(water.time)}
                         </Text>

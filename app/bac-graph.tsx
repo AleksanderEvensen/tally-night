@@ -20,7 +20,7 @@ export default function BacGraph() {
 
   if (!userInfo || drinks.length === 0) {
     return (
-      <View className="flex flex-1 bg-white items-center justify-center px-6">
+      <View className="flex flex-1 bg-background items-center justify-center px-6">
         <Stack.Screen options={{ title: 'BAC Over Time' }} />
         <Text variant="muted" className="text-center">
           No drink data yet.{'\n'}Add some drinks to see the graph.
@@ -64,7 +64,7 @@ export default function BacGraph() {
   const xLabelTimes = [timeStart, timeStart + timeRange / 2, timeEnd];
 
   return (
-    <View className="flex flex-1 bg-white">
+    <View className="flex flex-1 bg-background">
       <Stack.Screen options={{ title: 'BAC Over Time' }} />
 
       <View className="items-center pt-8 px-4">
@@ -85,8 +85,9 @@ export default function BacGraph() {
                   y1={y(val)}
                   x2={PAD.left + PLOT_W}
                   y2={y(val)}
-                  stroke="#e5e7eb"
+                  stroke="#6b7280"
                   strokeWidth={1}
+                  opacity={0.3}
                 />
               ))}
 

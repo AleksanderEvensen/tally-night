@@ -27,8 +27,6 @@ export default function Layout() {
                 <Stack
                   screenOptions={{
                     headerShadowVisible: false,
-                    headerStyle: { backgroundColor: '#fff' },
-                    contentStyle: { backgroundColor: '#fff' },
                   }}
                 />
                 <PortalHost />

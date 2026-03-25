@@ -30,7 +30,7 @@ export default function Onboarding() {
   }
 
   return (
-    <View className="flex flex-1 bg-white">
+    <View className="flex flex-1 bg-background">
       <Stack.Screen options={{ title: 'Setup', headerBackVisible: false }} />
 
       <ScrollView
@@ -38,17 +38,17 @@ export default function Onboarding() {
         contentContainerStyle={{ paddingBottom: bottom + 16 }}
         keyboardShouldPersistTaps="handled">
         <View className="pt-12">
-          <Text className="text-3xl font-bold text-gray-900 mb-2">Welcome</Text>
-          <Text className="text-base text-gray-500 mb-10">
+          <Text className="text-3xl font-bold mb-2">Welcome</Text>
+          <Text className="text-base text-muted-foreground mb-10">
             We need a few details to estimate your blood alcohol level. Everything stays on your
             device.
           </Text>
 
-          <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+          <Label className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
             Name
           </Label>
           <Input
-            className="mb-8 h-14 rounded-2xl border-2 border-gray-200 px-4 text-lg"
+            className="mb-8 h-auto text-lg ios:leading-0"
             placeholder="At least 2 characters"
             value={name}
             onChangeText={setName}
@@ -56,7 +56,7 @@ export default function Onboarding() {
             autoComplete="name"
           />
 
-          <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+          <Label className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
             Gender
           </Label>
           <View className="flex-row gap-3 mb-8">
@@ -64,13 +64,13 @@ export default function Onboarding() {
               onPress={() => setGender('male')}
               className={cn(
                 'flex-1 py-4 rounded-2xl items-center border-2',
-                gender === 'male' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+                gender === 'male' ? 'border-indigo-500 bg-indigo-500/10' : 'border-border bg-card'
               )}>
               <Text className="text-2xl mb-1">♂</Text>
               <Text
                 className={cn(
                   'text-base font-semibold',
-                  gender === 'male' ? 'text-indigo-600' : 'text-gray-600'
+                  gender === 'male' ? 'text-indigo-400' : 'text-muted-foreground'
                 )}>
                 Male
               </Text>
@@ -79,24 +79,24 @@ export default function Onboarding() {
               onPress={() => setGender('female')}
               className={cn(
                 'flex-1 py-4 rounded-2xl items-center border-2',
-                gender === 'female' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+                gender === 'female' ? 'border-indigo-500 bg-indigo-500/10' : 'border-border bg-card'
               )}>
               <Text className="text-2xl mb-1">♀</Text>
               <Text
                 className={cn(
                   'text-base font-semibold',
-                  gender === 'female' ? 'text-indigo-600' : 'text-gray-600'
+                  gender === 'female' ? 'text-indigo-400' : 'text-muted-foreground'
                 )}>
                 Female
               </Text>
             </Pressable>
           </View>
 
-          <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+          <Label className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
             Weight (kg)
           </Label>
           <Input
-            className="h-14 rounded-2xl border-2 border-gray-200 px-4 text-lg"
+            className="h-auto text-lg ios:leading-0"
             placeholder="e.g. 75"
             keyboardType="numeric"
             value={weight}
@@ -104,7 +104,7 @@ export default function Onboarding() {
           />
 
           {/* Age confirmation & disclaimer */}
-          <View className="mt-8 bg-amber-50 rounded-2xl p-4 border border-amber-200">
+          <View className="mt-8 bg-amber-500/10 rounded-2xl p-4 border border-amber-500/30">
             <Pressable
               onPress={() => setAgeConfirmed(!ageConfirmed)}
               className="flex-row items-start gap-3">
@@ -113,13 +113,13 @@ export default function Onboarding() {
                 onCheckedChange={(val) => setAgeConfirmed(val === true)}
                 className="mt-0.5"
               />
-              <Text className="flex-1 text-sm text-gray-700 leading-5">
+              <Text className="flex-1 text-sm leading-5">
                 I confirm that I am of legal drinking age in my country
               </Text>
             </Pressable>
 
-            <View className="mt-3 pt-3 border-t border-amber-200">
-              <Text className="text-xs text-amber-700 leading-4">
+            <View className="mt-3 pt-3 border-t border-amber-500/30">
+              <Text className="text-xs text-amber-600 dark:text-amber-400 leading-4">
                 This app is meant as a fun tool between friends and does not provide health or
                 medical advice. BAC estimates are approximate and should never be used to determine
                 fitness to drive or operate machinery. Always drink responsibly.
@@ -130,9 +130,15 @@ export default function Onboarding() {
           <Button
             onPress={handleContinue}
             disabled={!canContinue}
-            className={cn('mt-6 rounded-2xl py-4', canContinue ? 'bg-indigo-500' : 'bg-gray-200')}>
+            className={cn(
+              'mt-6 rounded-2xl py-4 h-auto',
+              canContinue ? 'bg-indigo-500' : 'bg-muted'
+            )}>
             <Text
-              className={cn('text-lg font-semibold', canContinue ? 'text-white' : 'text-gray-400')}>
+              className={cn(
+                'text-lg font-semibold',
+                canContinue ? 'text-white' : 'text-muted-foreground'
+              )}>
               Continue
             </Text>
           </Button>

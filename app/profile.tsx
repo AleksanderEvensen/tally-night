@@ -40,15 +40,15 @@ export default function Profile() {
   }
 
   return (
-    <View className="flex flex-1 bg-white px-6">
+    <View className="flex flex-1 bg-background px-6">
       <Stack.Screen options={{ title: 'Profile' }} />
 
       <View className="pt-8">
-        <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Label className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
           Name
         </Label>
         <Input
-          className="mb-8 h-14 rounded-2xl border-2 border-gray-200 px-4 text-lg"
+          className="mb-8 h-auto text-lg ios:leading-0"
           placeholder="At least 2 characters"
           value={name}
           onChangeText={setName}
@@ -56,7 +56,7 @@ export default function Profile() {
           autoComplete="name"
         />
 
-        <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Label className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
           Gender
         </Label>
         <View className="flex-row gap-3 mb-8">
@@ -64,13 +64,13 @@ export default function Profile() {
             onPress={() => setGender('male')}
             className={cn(
               'flex-1 py-4 rounded-2xl items-center border-2',
-              gender === 'male' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+              gender === 'male' ? 'border-indigo-500 bg-indigo-500/10' : 'border-border bg-card'
             )}>
             <Text className="text-2xl mb-1">♂</Text>
             <Text
               className={cn(
                 'text-base font-semibold',
-                gender === 'male' ? 'text-indigo-600' : 'text-gray-600'
+                gender === 'male' ? 'text-indigo-400' : 'text-muted-foreground'
               )}>
               Male
             </Text>
@@ -79,24 +79,24 @@ export default function Profile() {
             onPress={() => setGender('female')}
             className={cn(
               'flex-1 py-4 rounded-2xl items-center border-2',
-              gender === 'female' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+              gender === 'female' ? 'border-indigo-500 bg-indigo-500/10' : 'border-border bg-card'
             )}>
             <Text className="text-2xl mb-1">♀</Text>
             <Text
               className={cn(
                 'text-base font-semibold',
-                gender === 'female' ? 'text-indigo-600' : 'text-gray-600'
+                gender === 'female' ? 'text-indigo-400' : 'text-muted-foreground'
               )}>
               Female
             </Text>
           </Pressable>
         </View>
 
-        <Label className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Label className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
           Weight (kg)
         </Label>
         <Input
-          className="h-14 rounded-2xl border-2 border-gray-200 px-4 text-lg"
+          className="h-auto text-lg ios:leading-0"
           placeholder="e.g. 75"
           keyboardType="numeric"
           value={weight}
@@ -106,8 +106,12 @@ export default function Profile() {
         <Button
           onPress={handleSave}
           disabled={!canSave}
-          className={cn('mt-10 rounded-2xl py-4', canSave ? 'bg-indigo-500' : 'bg-gray-200')}>
-          <Text className={cn('text-lg font-semibold', canSave ? 'text-white' : 'text-gray-400')}>
+          className={cn('mt-10 rounded-2xl py-4 h-auto', canSave ? 'bg-indigo-500' : 'bg-muted')}>
+          <Text
+            className={cn(
+              'text-lg font-semibold',
+              canSave ? 'text-white' : 'text-muted-foreground'
+            )}>
             Save
           </Text>
         </Button>
@@ -115,15 +119,15 @@ export default function Profile() {
         <Button
           variant="outline"
           onPress={() => router.push('/drink-presets')}
-          className="mt-4 rounded-2xl py-4 border-2 border-gray-200">
-          <Text className="text-base font-semibold text-gray-600">Drink Presets</Text>
+          className="mt-4 rounded-2xl py-4 h-auto border-2 border-border">
+          <Text className="text-base font-semibold text-muted-foreground">Drink Presets</Text>
         </Button>
 
         <Button
           variant="outline"
           onPress={() => router.push('/privacy')}
-          className="mt-4 rounded-2xl py-4 border-2 border-gray-200">
-          <Text className="text-base font-semibold text-gray-600">Data & Privacy</Text>
+          className="mt-4 rounded-2xl py-4 h-auto border-2 border-border">
+          <Text className="text-base font-semibold text-muted-foreground">Data & Privacy</Text>
         </Button>
       </View>
     </View>

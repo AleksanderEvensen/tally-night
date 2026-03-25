@@ -65,17 +65,17 @@ export default function AddDrink() {
   }
 
   return (
-    <View className="flex flex-1 bg-white">
+    <View className="flex flex-1 bg-background">
       <Stack.Screen options={{ title: 'Add a Drink' }} />
       <KeyboardAwareScrollView
         contentContainerStyle={{ padding: 24, paddingBottom: bottom + 24 }}
         keyboardShouldPersistTaps="handled"
         bottomOffset={24}>
         {/* Time selector */}
-        <View className="flex-row items-center justify-between mb-6 bg-gray-50 rounded-xl p-3">
-          <Text className="text-sm text-gray-500">Time</Text>
+        <View className="flex-row items-center justify-between mb-6 bg-muted rounded-xl p-3">
+          <Text className="text-sm text-muted-foreground">Time</Text>
           <Button variant="outline" onPress={() => setShowTimePicker(true)} className="px-4 py-2">
-            <Text className="text-base font-medium text-indigo-600">{formatTime(drinkTime)}</Text>
+            <Text className="text-base font-medium text-indigo-400">{formatTime(drinkTime)}</Text>
           </Button>
         </View>
 
@@ -99,17 +99,15 @@ export default function AddDrink() {
         )}
 
         {/* Presets */}
-        <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Text className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
           Quick Pick
         </Text>
         <View className="flex-row flex-wrap gap-4 mb-6">
           {drinkPresets.map((preset) => (
             <Pressable key={preset.id} onPress={() => handleSelect(preset)} className="w-[47%]">
-              <Card className="p-4 items-center active:border-indigo-400 active:bg-indigo-50">
+              <Card className="p-4 items-center active:border-indigo-400 active:bg-indigo-500/10">
                 <Text className="text-4xl mb-2">{preset.emoji}</Text>
-                <Text className="text-base font-semibold text-gray-800 text-center">
-                  {preset.name}
-                </Text>
+                <Text className="text-base font-semibold text-center">{preset.name}</Text>
                 <Text variant="muted" className="mt-1">
                   {preset.volumeMl}ml · {preset.alcoholPercent}%
                 </Text>
@@ -119,19 +117,19 @@ export default function AddDrink() {
         </View>
 
         {/* Custom drink */}
-        <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Text className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
           Custom Drink
         </Text>
         {!showCustom ? (
           <Pressable
             onPress={() => setShowCustom(true)}
-            className="border-2 border-dashed border-gray-300 rounded-2xl py-6 items-center">
+            className="border-2 border-dashed border-border rounded-2xl py-6 items-center">
             <Text className="text-2xl mb-1">🍹</Text>
-            <Text className="text-base text-gray-500">Tap to enter a custom drink</Text>
+            <Text className="text-base text-muted-foreground">Tap to enter a custom drink</Text>
           </Pressable>
         ) : (
           <Card className="p-4">
-            <Label className="text-sm text-gray-500 mb-2">Type</Label>
+            <Label className="text-sm text-muted-foreground mb-2">Type</Label>
             <View className="flex-row flex-wrap gap-2 mb-4">
               {DRINK_TYPES.map((t) => (
                 <Button
@@ -144,7 +142,7 @@ export default function AddDrink() {
                   <Text className="text-base">{DRINK_TYPE_EMOJI[t]}</Text>
                   <Text
                     className={`text-sm font-medium ${
-                      customType === t ? 'text-white' : 'text-gray-600'
+                      customType === t ? 'text-white' : 'text-muted-foreground'
                     }`}>
                     {DRINK_TYPE_LABEL[t]}
                   </Text>
@@ -152,18 +150,18 @@ export default function AddDrink() {
               ))}
             </View>
 
-            <Label className="text-sm text-gray-500 mb-1">Volume (ml)</Label>
+            <Label className="text-sm text-muted-foreground mb-1">Volume (ml)</Label>
             <Input
-              className="mb-3 h-9"
+              className="mb-3 h-auto text-lg ios:leading-0"
               placeholder="e.g. 330"
               keyboardType="numeric"
               value={customVolume}
               onChangeText={setCustomVolume}
             />
 
-            <Label className="text-sm text-gray-500 mb-1">Alcohol %</Label>
+            <Label className="text-sm text-muted-foreground mb-1">Alcohol %</Label>
             <Input
-              className="mb-4 h-9"
+              className="mb-4 h-auto text-lg ios:leading-0"
               placeholder="e.g. 5"
               keyboardType="numeric"
               value={customPercent}
@@ -173,10 +171,10 @@ export default function AddDrink() {
             <Button
               onPress={handleCustomSubmit}
               disabled={!canSubmitCustom}
-              className={`rounded-xl py-3 ${canSubmitCustom ? 'bg-indigo-500' : 'bg-gray-200'}`}>
+              className={`rounded-xl py-4 h-auto ${canSubmitCustom ? 'bg-indigo-500' : 'bg-muted'}`}>
               <Text
                 className={`text-base font-semibold ${
-                  canSubmitCustom ? 'text-white' : 'text-gray-400'
+                  canSubmitCustom ? 'text-white' : 'text-muted-foreground'
                 }`}>
                 Add Drink
               </Text>

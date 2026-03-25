@@ -34,46 +34,46 @@ export default function JoinGroup() {
       });
       router.replace({ pathname: '/session', params: { groupId: res.groupId } });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Could not join group. Please try again.';
-      setError(message);
+      const raw = err instanceof Error ? err.message : '';
+      if (raw.includes('already a member')) {
+        setError('You are already a member of this group.');
+      } else if (raw.includes('No group found')) {
+        setError('Invalid code. Please check and try again.');
+      } else {
+        setError('Could not join group. Please try again.');
+      }
     } finally {
       setIsJoining(false);
     }
   }
 
   return (
-    <View className="flex flex-1 bg-white px-6">
+    <View className="flex flex-1 bg-background px-6">
       <Stack.Screen options={{ title: 'Join Group' }} />
       <View className="pt-8 items-center">
-        <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Text className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
           Enter Join Code
         </Text>
         <Input
-          className="mb-8 w-full"
+          className="mb-8 h-auto text-4xl ios:leading-0 font-bold text-center"
           placeholder="ABC123"
-          placeholderTextColor="#d1d5db"
           value={cleanCode}
           onChangeText={(text) => setCode(text.toUpperCase())}
           autoCapitalize="characters"
           maxLength={6}
           autoFocus
           style={{
-            height: 64,
-            fontSize: 28,
-            textAlign: 'center',
             letterSpacing: 6,
-            fontWeight: 'bold',
           }}
         />
 
-        <Text className="text-sm text-gray-400 mb-8 text-center">
+        <Text className="text-sm text-muted-foreground mb-8 text-center">
           Ask the group creator for the 6-character code
         </Text>
 
         {error && <Text className="text-sm text-red-500 text-center mb-4">{error}</Text>}
 
-        <Button onPress={handleJoin} disabled={!canJoin} className="rounded-2xl py-4 w-full">
+        <Button onPress={handleJoin} disabled={!canJoin} className="rounded-2xl py-4 h-auto w-full">
           <Text>{isJoining ? 'Joining...' : 'Join Group'}</Text>
         </Button>
       </View>

@@ -40,7 +40,7 @@ export default function DrinkPresets() {
   }
 
   return (
-    <View className="flex flex-1 bg-white">
+    <View className="flex flex-1 bg-background">
       <Stack.Screen options={{ title: 'Drink Presets' }} />
       <ScrollView
         className="flex-1"
@@ -50,7 +50,7 @@ export default function DrinkPresets() {
         </Text>
 
         {drinkPresets.length === 0 && (
-          <View className="border-2 border-dashed border-gray-300 rounded-2xl py-8 items-center mb-4">
+          <View className="border-2 border-dashed border-border rounded-2xl py-8 items-center mb-4">
             <Text className="text-muted-foreground">No presets yet</Text>
           </View>
         )}
@@ -83,7 +83,7 @@ export default function DrinkPresets() {
         <Button
           variant="outline"
           onPress={() => router.push('/edit-preset')}
-          className="border-2 border-dashed border-gray-300 rounded-2xl py-5 mb-6 h-auto flex-col">
+          className="border-2 border-dashed border-border rounded-2xl py-5 mb-6 h-auto flex-col">
           <Text className="text-2xl mb-1">+</Text>
           <Text className="text-muted-foreground">Add New Preset</Text>
         </Button>

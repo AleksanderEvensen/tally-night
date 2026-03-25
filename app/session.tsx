@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useQuery, useMutation } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -75,17 +75,23 @@ export default function Session() {
     setLeaveDialogOpen(false);
   }
 
+  useEffect(() => {
+    if (data === null) {
+      router.replace('/');
+    }
+  }, [data]);
+
   if (!data) {
     return (
-      <View className="flex flex-1 bg-white items-center justify-center">
+      <View className="flex flex-1 bg-background items-center justify-center">
         <Stack.Screen options={{ title: 'Session' }} />
-        <Text className="text-gray-400">Loading...</Text>
+        <Text className="text-muted-foreground">Loading...</Text>
       </View>
     );
   }
 
   return (
-    <View className="flex flex-1 bg-white">
+    <View className="flex flex-1 bg-background">
       <Stack.Screen options={{ title: data.groupName }} />
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: bottom + 16 }}>
         {/* Group info header */}
@@ -94,16 +100,16 @@ export default function Session() {
           <View className="flex-row items-center gap-2 mt-2">
             <Pressable
               onPress={handleCopyCode}
-              className="flex-row items-center gap-1.5 bg-gray-100 rounded-full px-4 py-1.5">
-              <Text className="text-sm font-semibold text-gray-600">{data.joinCode}</Text>
+              className="flex-row items-center gap-1.5 bg-muted rounded-full px-4 py-1.5">
+              <Text className="text-sm font-semibold text-muted-foreground">{data.joinCode}</Text>
               <Ionicons
                 name={copied ? 'checkmark' : 'copy-outline'}
                 size={14}
                 color={copied ? '#22c55e' : '#6b7280'}
               />
             </Pressable>
-            <View className="bg-gray-100 rounded-full px-3 py-1.5">
-              <Text className="text-sm text-gray-500">{formatExpiry(data.expires)}</Text>
+            <View className="bg-muted rounded-full px-3 py-1.5">
+              <Text className="text-sm text-muted-foreground">{formatExpiry(data.expires)}</Text>
             </View>
           </View>
         </View>
@@ -111,7 +117,7 @@ export default function Session() {
         {/* Members */}
         <View className="px-6">
           {data.leaderboard.length === 0 ? (
-            <Text className="text-gray-400 text-center py-8">No members yet</Text>
+            <Text className="text-muted-foreground text-center py-8">No members yet</Text>
           ) : (
             data.leaderboard.map((member, index) => {
               const rank = index + 1;
@@ -120,55 +126,55 @@ export default function Session() {
                 <Card
                   key={member.userId}
                   className={`flex-row items-center py-4 px-4 mb-2 ${
-                    isMe ? 'bg-indigo-50 border-indigo-200' : ''
+                    isMe ? 'bg-indigo-500/10 border-indigo-500/30' : ''
                   }`}>
                   {/* Rank */}
                   <View className="w-10 items-center">
-                    <Text className={`text-lg ${rank <= 3 ? '' : 'font-semibold text-gray-400'}`}>
+                    <Text
+                      className={`text-lg ${rank <= 3 ? '' : 'font-semibold text-muted-foreground'}`}>
                       {getRankEmoji(rank)}
                     </Text>
                   </View>
 
                   {/* Name & drinks */}
                   <View className="flex-1 ml-2">
-                    <Text
-                      className={`text-base font-semibold ${isMe ? 'text-indigo-600' : 'text-gray-900'}`}>
+                    <Text className={`text-base font-semibold ${isMe ? 'text-indigo-400' : ''}`}>
                       {member.name}
                       {isMe ? ' (you)' : ''}
                     </Text>
                     <View className="flex-row items-center gap-2 mt-0.5">
                       {member.drinks.beer > 0 && (
-                        <Text className="text-xs text-gray-400">
+                        <Text className="text-xs text-muted-foreground">
                           {'\u{1F37A}'}
                           {member.drinks.beer}
                         </Text>
                       )}
                       {member.drinks.wine > 0 && (
-                        <Text className="text-xs text-gray-400">
+                        <Text className="text-xs text-muted-foreground">
                           {'\u{1F377}'}
                           {member.drinks.wine}
                         </Text>
                       )}
                       {member.drinks.spirits > 0 && (
-                        <Text className="text-xs text-gray-400">
+                        <Text className="text-xs text-muted-foreground">
                           {'\u{1F943}'}
                           {member.drinks.spirits}
                         </Text>
                       )}
                       {member.drinks.cocktails > 0 && (
-                        <Text className="text-xs text-gray-400">
+                        <Text className="text-xs text-muted-foreground">
                           {'\u{1F378}'}
                           {member.drinks.cocktails}
                         </Text>
                       )}
                       {member.drinks.shots > 0 && (
-                        <Text className="text-xs text-gray-400">
+                        <Text className="text-xs text-muted-foreground">
                           {'\u{1F943}'}
                           {member.drinks.shots}
                         </Text>
                       )}
                       {member.drinks.ciders_seltzers > 0 && (
-                        <Text className="text-xs text-gray-400">
+                        <Text className="text-xs text-muted-foreground">
                           {'\u{1F34F}'}
                           {member.drinks.ciders_seltzers}
                         </Text>
@@ -183,7 +189,7 @@ export default function Session() {
                       className="text-2xl font-bold">
                       {member.bloodAlcoholLevel.toFixed(2)}
                     </Text>
-                    <Text className="text-xs text-gray-400">{'\u2030'}</Text>
+                    <Text className="text-xs text-muted-foreground">{'\u2030'}</Text>
                   </View>
                 </Card>
               );
@@ -195,7 +201,7 @@ export default function Session() {
 
         {/* Disclaimer */}
         <View className="px-6 mt-4">
-          <Text className="text-xs text-gray-400 text-center leading-4">
+          <Text className="text-xs text-muted-foreground text-center leading-4">
             Please drink responsibly. BAC values are estimates only and should never be used to
             determine fitness to drive or operate machinery.
           </Text>
@@ -206,7 +212,7 @@ export default function Session() {
           <Button
             variant="outline"
             onPress={() => setLeaveDialogOpen(true)}
-            className="border-2 border-red-200 rounded-2xl py-3">
+            className="border-2 border-red-500/30 rounded-2xl py-4 h-auto">
             <Text className="text-red-500 text-base font-semibold">Leave Group</Text>
           </Button>
         </View>

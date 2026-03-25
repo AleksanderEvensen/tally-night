@@ -61,20 +61,20 @@ export default function CreateGroup() {
 
   if (result) {
     return (
-      <View className="flex flex-1 bg-white px-6 items-center justify-center">
+      <View className="flex flex-1 bg-background px-6 items-center justify-center">
         <Stack.Screen options={{ title: 'Group Created' }} />
         <Text variant="h3" className="mb-2">
           Group Created!
         </Text>
-        <Text className="text-base text-gray-500 mb-6 text-center">
+        <Text className="text-base text-muted-foreground mb-6 text-center">
           Share this code with your friends to join:
         </Text>
         <Card className="px-8 py-6 items-center mb-4">
-          <Text className="text-4xl font-bold text-indigo-600 tracking-[8px]">
+          <Text className="text-4xl font-bold text-indigo-400 tracking-[8px]">
             {result.joinCode}
           </Text>
         </Card>
-        <Button onPress={handleCopy} className="rounded-2xl py-3 px-8 mb-6">
+        <Button onPress={handleCopy} className="rounded-2xl py-4 h-auto px-8 mb-6">
           <Text>{copied ? 'Copied!' : 'Copy Code'}</Text>
         </Button>
         <Button
@@ -82,22 +82,22 @@ export default function CreateGroup() {
           onPress={() =>
             router.replace({ pathname: '/session', params: { groupId: result.groupId } })
           }
-          className="border-2 border-indigo-500 rounded-2xl py-3 px-8">
-          <Text className="text-indigo-500 text-base font-semibold">View Session</Text>
+          className="border-2 border-indigo-500 rounded-2xl py-4 h-auto px-8">
+          <Text className="text-indigo-400 text-base font-semibold">View Session</Text>
         </Button>
       </View>
     );
   }
 
   return (
-    <View className="flex flex-1 bg-white px-6">
+    <View className="flex flex-1 bg-background px-6">
       <Stack.Screen options={{ title: 'Create Group' }} />
       <View className="pt-8">
-        <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Text className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
           Group Name
         </Text>
         <Input
-          className="mb-8 h-14 rounded-2xl border-2 border-gray-200 px-4 text-lg"
+          className="mb-8 h-auto text-lg ios:leading-0"
           placeholder="e.g. Friday Night"
           value={name}
           onChangeText={setName}
@@ -105,7 +105,7 @@ export default function CreateGroup() {
           autoFocus
         />
 
-        <Text className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+        <Text className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
           Expires After
         </Text>
         <View className="flex-row gap-2 mb-8">
@@ -115,12 +115,12 @@ export default function CreateGroup() {
               onPress={() => setExpiryHours(opt.hours)}
               className={`flex-1 py-3 rounded-xl items-center border-2 ${
                 expiryHours === opt.hours
-                  ? 'border-indigo-500 bg-indigo-50'
-                  : 'border-gray-200 bg-white'
+                  ? 'border-indigo-500 bg-indigo-500/10'
+                  : 'border-border bg-card'
               }`}>
               <Text
                 className={`text-sm font-semibold ${
-                  expiryHours === opt.hours ? 'text-indigo-600' : 'text-gray-500'
+                  expiryHours === opt.hours ? 'text-indigo-400' : 'text-muted-foreground'
                 }`}>
                 {opt.label}
               </Text>
@@ -130,7 +130,7 @@ export default function CreateGroup() {
 
         {error && <Text className="text-sm text-red-500 text-center mb-4">{error}</Text>}
 
-        <Button onPress={handleCreate} disabled={!canCreate} className="rounded-2xl py-4">
+        <Button onPress={handleCreate} disabled={!canCreate} className="rounded-2xl py-4 h-auto">
           <Text>{isCreating ? 'Creating...' : 'Create Group'}</Text>
         </Button>
       </View>
