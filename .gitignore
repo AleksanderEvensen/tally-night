@@ -26,3 +26,7 @@ android
 *.apk
 
 .env.local
+.env.production
+build-*
+*.apk
+*.aab
