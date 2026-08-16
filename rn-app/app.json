@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "Tally Night",
+    "slug": "tally-night",
+    "version": "1.1.0",
+    "scheme": "tally-night",
+    "platforms": ["ios", "android"],
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": ["expo-router", "@react-native-community/datetimepicker"],
+    "experiments": {
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    },
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#0F1633"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "no.ahse.tallynight",
+      "icon": "./assets/Tally-Night.icon",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "no.ahse.tallynight",
+      "softwareKeyboardLayoutMode": "resize",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F1633"
+      }
+    },
+    "owner": "aleksander-hse",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "872d1cef-6477-4abf-a6f3-9d7427efbb70"
+      }
+    }
+  }
+}

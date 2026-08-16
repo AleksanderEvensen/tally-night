@@ -1,0 +1,13 @@
+{
+  "prettier.enable": false,
+  "eslint.enable": false,
+  "oxc.enable": true,
+
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true,
+
+  "[javascript][javascriptreact][typescript][typescriptreact][json][jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  }
+}

@@ -1,32 +1,16 @@
-node_modules/
-.expo/
-dist/
-npm-debug.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
-web-build/
-# expo router
-expo-env.d.ts
-
-
-
-ios
-android
-
-# macOS
+node_modules
 .DS_Store
-
-# Temporary files created by Metro to check the health of the file watcher
-.metro-health-check*
-
-*.apk
-
-.env.local
-.env.production
-build-*
-*.apk
-*.aab
+dist
+dist-ssr
+*.local
+.env
+.nitro
+.tanstack
+.wrangler
+.output
+.vinxi
+__unconfig*
+todos.json
+local.db
+local.db-shm
+local.db-wal
